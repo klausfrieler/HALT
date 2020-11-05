@@ -17,12 +17,7 @@ media_js <- list(
   show_responses = "document.getElementById('response_ui').style.visibility = 'inherit';"
 )
 
-#media_mobile_play_button <- shiny::tags$button(
-#  shiny::tags$strong(psychTestR::i18n("CLICK_HERE_TO_PLAY")),
-#  id = "btn_play_media",
-#  style = "visibility: visible;height: 50px",
-#  onclick = media_js$play_media
-#)
+
 
 media_mobile_play_button <- shiny::tags$p(
   shiny::tags$button(shiny::tags$span("\u25B6"),
@@ -60,59 +55,34 @@ get_audio_ui <- function(url,
   shiny::tags$div(audio, media_mobile_play_button)
 }
 
-get_audio_element <- function(url,
-                              type = tools::file_ext(url),
-                              wait = F,
-                              autoplay = FALSE,
-                              width = 200,
-                              height = 50,
-                              id = "media") {
-  #print(url)
-  stopifnot(purrr::is_scalar_character(url),
-            purrr::is_scalar_character(type)
-            )
-  src    <- shiny::tags$source(src = url, type = paste0("audio/", type))
-  script <- shiny::tags$script(shiny::HTML(media_js$media_not_played))
-  audio  <- shiny::tags$audio(
-    src,
-    script,
-    id = id,
-    preload = "auto",
-    controls = "controls",
-    controlslist = "nodownload noremoteplayback",
-    autoplay = if(autoplay) "autoplay",
-    width = width,
-    height = height,
-    onplay = paste0(media_js$media_played, media_js$hide_media),
-    onended = if (wait) paste0(media_js$show_responses, media_js$hide_media) else "null"
-  )
-  audio
-}
 
-audio_NAFC_page_flex <- function(label,
-                                 prompt,
-                                 choices,
-                                 audio_url,
-                                 save_answer = TRUE,
-                                 on_complete = NULL,
-                                 admin_ui = NULL) {
+
+audio_text_page <- function(label,
+                            prompt,
+                            audio_url,
+                            correct_answer = "",
+                            save_answer = TRUE,
+                            on_complete = NULL,
+                            admin_ui = NULL) {
   stopifnot(purrr::is_scalar_character(label))
   audio_ui <- get_audio_ui(audio_url, wait = T, loop = F, width = 200)
-  #audio_ui <- get_audio_element(audio_url, autoplay = T, wait = T, width = 50)
 
   style <- NULL
   ui <- shiny::div(
     tagify(prompt),
     audio_ui,
-    psychTestR::make_ui_NAFC(choices,
-                 labels = choices,
-                 hide = TRUE,
-                 arrange_vertically = FALSE,
-                 id = "response_ui")
-    )
+    psychTestR::text_input_page(label = label,
+                                prompt = prompt,
+                                one_line = T,
+                                button_text = psychTestR::i18n("CONTINUE"),
+                                validate = function(x) !is.na(as.numeric(x)) & as.integer(x) == as.numeric(x),
+                                save_answer = save_answer,
+                                admin_ui= admin_ui))
+
   get_answer <- function(input, ...) {
     answer <- as.numeric(gsub("answer", "", input$last_btn_pressed))
-    correct <- EDT::EDT_item_bank[EDT::EDT_item_bank$item_number == label,]$correct == answer
+    correct <- answer %in% correct_answer
+    too_quiet <-
     tibble(answer = answer,
          label = label,
          correct = correct)
@@ -125,25 +95,22 @@ audio_NAFC_page_flex <- function(label,
                    admin_ui = admin_ui)
 }
 
-EDT_item <- function(label = "",
-                     correct_answer,
-                     prompt = "",
-                     audio_file,
-                     audio_dir = "",
-                     save_answer = TRUE,
-                     on_complete = NULL
+HALT_item_simple <- function(label = "",
+                             correct_answer,
+                             prompt = "",
+                             audio_file,
+                             audio_dir = "",
+                             save_answer = TRUE,
+                             on_complete = NULL
                      ){
 
   page_prompt <- shiny::div(prompt)
-  #printf("EDT item_called for  %s", label)
-
-  choices <- c("1", "2")
   audio_url <- file.path(audio_dir, audio_file)
-  audio_NAFC_page_flex(label = label,
-                       prompt = page_prompt,
-                       audio_url = audio_url,
-                       choices = choices,
-                       save_answer = save_answer,
-                       on_complete = on_complete)
+  audio_text_page(label = label,
+                  prompt = page_prompt,
+                  audio_url = audio_url,
+                  correct_answer = correct_answer,
+                  save_answer = save_answer,
+                  on_complete = on_complete)
 }
 

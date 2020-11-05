@@ -1,7 +1,3 @@
-# EDT 0.3.1
+# HALT 0.0.1
 
-* Updated to new lower-case language names
-
-# EDT 0.1.0
-
-* First release
+* Outline
