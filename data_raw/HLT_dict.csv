@@ -1,0 +1,39 @@
+key;de;en
+THLT_0001_I_0001_1;Bitte stellen Sie die Wiedergabelautstärke entsprechend der Vorgaben ein.\\Wenn Sie auf den Play-Button klicken, hören Sie ein kurzes Audiobeispiel, in dem leise Abschnitte von einem Rauschen zu hören sind. Bitte  **stellen Sie die Lautstärke Ihres Wiedergabegeräts so ein**, dass Sie alle Rauschabschnitte  **gerade so noch hören können**. Dabei sollte die Einstellung so gewählt werden, dass Sie es nicht mehr hören könnten, wenn Sie es nur ein kleines bisschen leiser stellen würden.;Please adjust the playback volume according to the following specifications.\\ When you click on the play button, you hear a short audio sample in which soft passages of noise are heard. Please **adjust the volume of your playback device** so that you can **still hear all noise passages**. The setting should be chosen so that you would not be able to hear it if you made it only a little bit quieter.
+THLT_0002_PROMPT;Wie viele Rauschabschnitte können Sie hören?\\Wenn Sie auf den Play-Button klicken, hören Sie ein kurzes Audiobeispiel, in dem leise und laute Abschnitte von einem Rauschen zu hören sind. Bitte  **zählen Sie alle leisen und lauten Rauschabschnitte**  und tragen Sie den Zahlenwert in das Textfeld ein.;How many noise passages can you hear?\\ When you click on the play button, you hear a short audio sample in which soft and loud passages of noise are heard. Please  **count all the soft and loud noise passages**  and enter the number in the text field.
+THLT_0003_PROMPT;"Wie viele Rauschabschnitte können Sie hören?\\Wenn Sie auf den Play-Button klicken, hören Sie ein kurzes Audiobeispiel in dem leise und laute Abschnitte von einem Rauschen zu hören sind. Bitte  **zählen Sie alle leisen und lauten Rauschabschnitte**  und tragen Sie den Zahlenwert in das Textfeld ein.
+";"How many noise passages can you hear?\\ When you click on the play button, you hear a short audio sample in which soft and loud passages of noise are heard. Please  **count all the soft and loud noise passages**  and enter the number in the text field.
+"
+THLT_0004_PROMPT;Auf dem Bild sind ein Kreis und ein Dreieck abgebildet. Befindet sich der Kreis links oder rechts vom Dreieck?;A circle and a triangle are shown in the picture. Is the circle to the left or right of the triangle?
+THLT_0005_PROMPT;"Wie viele Rauschabschnitte können Sie auf dem rechten Kopfhörer oder Lautsprecher zählen?\\Wenn Sie auf den Play-Button klicken, hören Sie ein kurzes Audiobeispiel in dem sowohl auf dem linken, als auch auf dem rechten Kanal Rauschabschnitte zu hören sind. Bitte zählen Sie alle Rauschabschnitte, die Sie auf dem  **rechten Kopfhörer oder Lautsprecher**  wahrnehmen können und tragen Sie die Zahl in das Textfeld ein.
+";"How many noise passages can you count on the right headphone or loudspeaker?\\ When you click on the play button, you hear a short audio sample in which noise passages are heard on both the left and the right channel. Please count all the noise passages that you can hear on the  **right headphone or speaker**  and enter the number in the text field.
+"
+THLT_0006_PROMPT;Wie bewegt sich das Rauschen?\\Wenn Sie auf den Play-Button klicken, hören Sie ein Rauschsignal, das die wahrgenommene Position über die Zeit verändert. Das Rauschen scheint sich zu bewegen. Wie würden Sie diese Bewegung beschreiben?;"How does the noise move?\\
+When you click on the play button, you will hear a noise signal that changes the perceived position over time. The noise seems to be moving. How would you describe this movement?"
+THLT_0007_PROMPT;Wo können Sie das Gehörte lokalisieren?\\Wenn Sie auf den Play-Button klicken, hören Sie ein Audiobeispiel in dem ein Ton zu hören ist. Sie sollen angeben, wo Sie den Ton lokalisieren können.;"Where can you locate the sound?\\
+When you click on the play button, you hear a short audio sample in which a tone is present. You should indicate where you can locate the sound."
+THLT_0008_PROMPT;Wie viele Töne können Sie hören?\\Wenn Sie auf den Play-Button klicken, hören Sie ein kurzes Audiobeispiel in dem in regelmäßigen Abständen ein Rauschen zu hören ist. Neben dem Rauschen sind auch Töne zu hören, die jedoch nie gleichzeitig mit dem Rauschen erklingen. Ihre Aufgabe ist es  **nur die gehörten Töne zu zählen**  und den Zahlenwert in das Textfeld einzutragen.  **Das Rauschen lassen Sie dabei unbeachtet und zählen es auch nicht mit**.;"How many tones can you hear?\\
+When you click on the play button, you will hear a short audio sample in which noise can be heard at regular intervals. In addition to the noise, tones are present. Tones and Noise never sound simultaneously. Your task is  ** to count only the tones heard **  and to enter the numerical value in the text field.  **You ignore the noise and don't count it**."
+THLT_0009_PROMPT;Wie viele Töne können Sie hören?\\Ihre Aufgabe ist es wieder  **nur die gehörten Töne zu zählen**  und den Zahlenwert in das Textfeld einzutragen.  **Das Rauschen lassen Sie dabei unbeachtet und zählen es auch nicht mit** .;"How many tones can you hear?\\ Your task is again  ** to count only the tones heard **  and to enter the numerical value in the text field.  **You ignore the noise and don't count it**.
+"
+THLT_0010_PROMPT;Wie viele Rauschabschnitte können Sie hören?\\ Wenn Sie auf den Play-Button klicken, hören Sie ein kurzes Audiobeispiel in dem leise und laute Abschnitte von einem Rauschen zu hören sind. Bitte  **zählen Sie alle leisen und lauten Rauschabschnitte**  und tragen Sie den Zahlenwert in das Textfeld ein.;How many noise passages can you hear?\\ When you click on the play button, you hear a short audio sample in which soft and loud passages of noise are heard. Please  **count all the soft and loud noise passages**  and enter the number in the text field.
+THLT_0004_CHOICES1;Links;Left
+THLT_0004_CHOICES2;Rechts;Right
+THLT_0001_CHOICES;Ich habe die Lautstärke eingestellt;I have adjusted the volume
+THLT_0006_CHOICES1;Regelmäßig von links nach rechts oder rechts nach links hin und her;Going back and forth regularly from left to right or right to left
+THLT_0006_CHOICES2;Unregelmäßig hin und her;Irregular back and forth
+THLT_0006_CHOICES3;Langsame von links nach rechts;Slowly from left to right
+THLT_0006_CHOICES4;Langsam von rechts nach links;Slowly from right to left
+THLT_0007_CHOICES1;Der Ton wandert von links nach rechts und anschließend wieder zurück nach links;The tone moves from the left to the right side and back to the left side again.
+THLT_0007_CHOICES2;Der Ton wandert von rechts nach links und anschließend wieder zurück nach rechts;The tone moves from the right to the left side and back to the right side again
+THLT_0007_CHOICES3;Der Ton ist nur links zu hören;The tone can only be heard on the left
+THLT_0007_CHOICES4;Der Ton ist nur rechts zu hören;The tone can only be heard on the right
+TESTNAME;Kopfhörer und Lautsprechertest;Headphone and Loudspeaker Test 
+TESTNAME_SHORT;HALT;HALT
+ENTER_ID;Bitte gib Deine ID ein;Please enter your ID
+PROBLEMS_INFO_1;Probleme?;Problems?
+PROBLEMS_INFO_2;Dann schreibe eine E-Mail an ;Contact 
+PROBLEMS_INFO_3;mit dem Verweis auf diese Seite.; with a link to this page.
+WARNING_IMPRECISE;Ihre Eingabe war leider falsch. Bitte wiederholen Sie die Aufgabe. Versuchen Sie dabei bitte genauer hinzuhören.;Unfortunately, your input was wrong. Please repeat the task and listen more carefully.
+WARNING_TOO_QUIET;Ihre Eingabe war leider falsch. Die Wiedergabelautstärke ist vermutlich zu gering. Sie können die Lautstärke um einen kleinstmöglichen Wert erhöhen und danach die Aufgabe wiederholen.;Unfortunately, your input was wrong. The playback volume is probably too low. You can increase the volume by the smallest possible value and then repeat the task.
+CONTINUE;Weiter;Continue
