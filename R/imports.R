@@ -13,6 +13,9 @@ NULL
 #' @importFrom tibble "tibble"
 NULL
 
+#' @importFrom tibble "as_tibble"
+NULL
+
 #' @importFrom purrr "is_scalar_double"
 NULL
 

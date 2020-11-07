@@ -25,9 +25,11 @@ debug_locally <- !grepl("shiny-server", getwd())
 HALT_standalone  <- function(title = NULL,
                             with_id = TRUE,
                             with_welcome = FALSE,
-                            test_AB_strategy = c("AB", "or"),
-                            admin_password = "conifer",
-                            researcher_email = "longgold@gold.uc.ak",
+                            test_AB_strategy = c(tests = "AB",
+                                                 condition = "or",
+                                                 keep = c("headphones", "loudspeaker")),
+                            admin_password = "HALTadmin",
+                            researcher_email = "yves.wycisk@hmtm-hannover.de",
                             languages = c("en", "de"),
                             dict = HALT::HALT_dict,
                             audio_dir = "https://media.gold-msi.org/test_materials/HLT",
@@ -49,7 +51,7 @@ HALT_standalone  <- function(title = NULL,
                dict = dict,
                ...),
     psychTestR::elt_save_results_to_disk(complete = TRUE),
-    HALT:::HALT_final_page(dict = dict)
+    HALT_final_page(dict = dict)
   )
   if(is.null(title)){
     #extract title as named vector from dictionary

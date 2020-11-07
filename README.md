@@ -1,4 +1,4 @@
-# Headphone and Loudspeaker TEst (HALT)
+# Headphone and Loudspeaker Test (HALT)
 
 
 The HALT is a test for detection whether online experiment takers use headphones or loudspeakers 
@@ -42,12 +42,6 @@ You can demo the HALT at the R console, as follows:
 # Load the HALT package
 library(HALT)
 
-# Run a demo test, with feedback as you progress through the test,
-# and not saving your data
-HALT_demo()
-
-# Run a demo test, skipping the training phase, and only asking 5 questions, as well a changinge the language
-HALT_demo(num_items = 5, language = "de")
 ```
 
 ### Testing a participant
@@ -61,7 +55,12 @@ library(HALT)
 
 # Run the test as if for a participant, using default settings,
 # saving data, and with a custom admin password
-HALT_standalone(admin_password = "put-your-password-here")
+# You can specify a strategy how to use the test A and B in the HALT using a 
+# vector like test_AB_strategy  = c(tests = "AB", condition = "or", devices = "headphones"),
+# where the first component is a string that should contain A, B or A and B to specifcy, which tests to include
+# the second component can be "or" or "and" and indicates the strategy to use information from one or both tests #(ignored if only one test is used), and the third component is a string, which device is admitted. Non-admitted
+# devices will result in ending the test immediately. If the third component is missing, all devices will be allowed.
+HALT_standalone(test_AB_strategy, admin_password = "put-your-password-here")
 ```
 
 You will need to enter a participant ID for each participant.

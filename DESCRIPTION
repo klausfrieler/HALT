@@ -4,7 +4,7 @@ Title: Headphone and Loudspeaker Test
 Version: 0.0.1
 Author: Klaus Frieler, Yves Wycisk
 Maintainer: Klaus Frieler <kf@omniversum.de>
-Description: Implementation of a headphone and loudspeaker detection test for online experiement
+Description: Implementation of a headphone and loudspeaker detection test for online experiment.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,4 +23,4 @@ Suggests:
     codetools,
     devtools (>= 1.13.6)
 Remotes: pmcharrison/psychTestR
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
