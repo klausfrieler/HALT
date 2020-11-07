@@ -36,18 +36,21 @@ item_bank <- read.csv("data_raw/item_bank.csv", sep  =";", stringsAsFactors = F)
   as_tibble() %>%
   left_join(stimuli_map  %>%
               as_tibble() %>%
-              mutate(stimulus_id = tolower(names(stimuli_map))) %>%
+              mutate(stimulus_id = tolower(names(stimuli_map)), value = sprintf("%s.mp3", names(stimuli_map))) %>%
               select(stimulus_id, audio_file = value), by = "stimulus_id")
+item_bank[item_bank$stimulus_id == "po4",]$audio_file <- "Po4.png"
 
 usethis::use_data(item_bank, overwrite = TRUE)
 
-#HLT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
-HALT_dict_raw <- read.csv("data_raw/HLT_dict.csv",
-                         sep = ";",
-                         stringsAsFactors = F)  %>%
-  mutate(de = gsub("[\n\r]", "", de),
-         en = gsub("[\n\r]", "", en))
+HLT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
+
+
+#HALT_dict_raw <- read.csv("data_raw/HLT_dict.csv",
+#                         sep = ";",
+#                         stringsAsFactors = F)  %>%
+#  mutate(de = gsub("[\n\r]", "", de),
+#         en = gsub("[\n\r]", "", en))
 #  mutate(de = gsub("\\\\", "\\ ", de, fixed = T),
 #         en = gsub("\\\\", "\\ ", en, fixed = T))
-HALT_dict <- HALT_dict_raw %>% psychTestR::i18n_dict$new()
+HALT_dict <- HLT_dict_raw %>% psychTestR::i18n_dict$new()
 usethis::use_data(HALT_dict, overwrite = TRUE)

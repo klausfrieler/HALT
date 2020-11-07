@@ -24,11 +24,13 @@ debug_locally <- !grepl("shiny-server", getwd())
 #' @export
 HALT_standalone  <- function(title = NULL,
                             with_id = TRUE,
-                            with_welcome = TRUE,
+                            with_welcome = FALSE,
+                            test_AB_strategy = c("AB", "or"),
                             admin_password = "conifer",
                             researcher_email = "longgold@gold.uc.ak",
                             languages = c("en", "de"),
                             dict = HALT::HALT_dict,
+                            audio_dir = "https://media.gold-msi.org/test_materials/HLT",
                             validate_id = "auto",
                             ...) {
   elts <- psychTestR::join(
@@ -39,13 +41,15 @@ HALT_standalone  <- function(title = NULL,
                              validate = validate_id),
         dict = dict),
     if(with_welcome) HALT_welcome_page(dict = dict),
-    HALT::HALT(num_items = num_items,
-             with_welcome =  FALSE,
-             feedback = feedback,
-             dict = dict,
-             ...),
+    HALT::HALT(label = "HALT",
+               with_welcome =  FALSE,
+               with_finish = FALSE,
+               audio_dir = audio_dir,
+               test_AB_strategy = test_AB_strategy,
+               dict = dict,
+               ...),
     psychTestR::elt_save_results_to_disk(complete = TRUE),
-    HALT_final_page(dict = dict)
+    HALT:::HALT_final_page(dict = dict)
   )
   if(is.null(title)){
     #extract title as named vector from dictionary

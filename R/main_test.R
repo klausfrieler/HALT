@@ -20,58 +20,48 @@ scoring <- function(){
 
 }
 
-
-main_test <- function(label, num_items_in_test, audio_dir, dict = HALT::HALT_dict) {
-  elts <- c()
-  item_bank <- HALT::HALT_item_bank
-  item_sequence <- sample(1:nrow(item_bank), num_items_in_test)
+parse_testAB_strategy <- function(test_AB_strategy){
   #browser()
-  for(i in 1:length(item_sequence)){
-    item <- HALT::HALT_item_bank[item_sequence[i],]
-    emotion <- psychTestR::i18n(item[1,]$emotion_i18)
-    #printf("Emotion %s ", emotion)
-    item_page <-
-      HALT_item(label = item$item_number[1],
-               correct_answer = item$correct[1],
-               prompt = get_prompt(i, num_items_in_test, emotion),
-               audio_file = item$audio_file[1],
-               audio_dir = audio_dir,
-               save_answer = TRUE)
-    elts <- psychTestR::join(elts, item_page)
+  include_testAB <- c(A = FALSE, B = FALSE)
+  if(length(test_AB_strategy) > 0){
+    if("A" %in% unlist(strsplit(test_AB_strategy[1], ""))) {
+      include_testAB["A"] <- TRUE
+    }
+    if("B" %in% unlist(strsplit(test_AB_strategy[1], ""))) {
+      include_testAB["B"] <- TRUE
+    }
   }
+  operator <- "or"
+  if(length(test_AB_strategy) > 1){
+    operator <- test_AB_strategy[2]
+  }
+  list(includes = include_testAB, operator = operator)
+}
+
+main_test <- function(label, audio_dir, test_AB_strategy, dict= HALT::HALT_dict) {
+  parseAB <-  parse_testAB_strategy(test_AB_strategy)
+  if(sum(parseAB$includes) == 0){
+    stop("Must include at least one of A or B")
+  }
+  elts <- psychTestR::join(
+    page_po1(audio_dir),
+    page_force_correct(2, audio_dir),
+    page_calibrate(3, audio_dir),
+    page_po4(audio_dir),
+    page_force_correct(5, audio_dir),
+    if(parseAB$includes["A"]) page_testAB(6, audio_dir),
+    if(parseAB$includes["B"]) page_testAB(7, audio_dir),
+    code_block(function(state,...){
+
+    }),
+    page_calibrate(8, audio_dir),
+    page_calibrate(9, audio_dir),
+    page_calibrate(10, audio_dir),
+    page_calibrate(11, audio_dir)
+  )
   elts
 }
 
-
-item_page <- function(item_number, item_id, num_items_in_test, audio_dir, dict = HALT::HALT_dict) {
-  item <- HALT::HALT_item_bank %>% filter(item_number == item_id) %>% as.data.frame()
-  emotion <- psychTestR::i18n(item[1,]$emotion_i18)
-  HALT_item(label = item_id,
-           correct_answer = item$correct[1],
-           prompt = get_prompt(item_number, num_items_in_test, emotion),
-           audio_file = item$audio_file[1],
-           audio_dir = audio_dir,
-           save_answer = TRUE)
-
-}
-
-get_prompt <- function(item_number, num_items_in_test, emotion, dict = HALT::HALT_dict) {
-  shiny::div(
-    shiny::h4(
-      psychTestR::i18n(
-        "PROGRESS_TEXT",
-        sub = list(num_question = item_number,
-                   test_length = if (is.null(num_items_in_test))
-                     "?" else
-                       num_items_in_test)),
-      style  = "text_align:left"
-    ),
-    shiny::p(
-      psychTestR::i18n("ITEM_INSTRUCTION",
-                       sub = list(emotion = emotion)),
-      style = "margin-left:20%;margin-right:20%;text-align:justify")
-    )
-}
 
 HALT_welcome_page <- function(dict = HALT::HALT_dict){
   psychTestR::new_timeline(
