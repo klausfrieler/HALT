@@ -128,7 +128,7 @@ HALT_audio_NAFC_page <- function(page_no,
   audio_url <- get_audio_url(audio_dir, page_no, sub_id)
   correct_answers <- get_item(page_no, sub_id, "correct_answer")
   messagef("Correct answers: %s", correct_answers)
-  prompt <- shiny:div(psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)), label)
+  prompt <- shiny::div(psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)), label)
   on_complete <- function(answer, state, ...) {
     #browser()
     correct_answers <- as.numeric(strsplit(correct_answers, ",") %>% unlist())
