@@ -315,7 +315,7 @@ left_right_page <- function(audio_dir, right_first){
   img_url <- gsub("mp3", "png", get_audio_url(audio_dir = audio_dir, page_no = 4, sub_id = ""))
   psychTestR::new_timeline(
     psychTestR::NAFC_page("po4",
-                          prompt = shiny::div(p(psychTestR::i18n("THLT_0004_PROMPT")),
+                          prompt = shiny::div(shiny::p(psychTestR::i18n("THLT_0004_PROMPT")),
                                               shiny::p(shiny::img(src = img_url, style = "width:200px;text_align:center"))),
                           choices = c("left", "right")[perm],
                           labels = c(psychTestR::i18n("THLT_0004_CHOICES1"),
