@@ -15,7 +15,7 @@ parse_testAB_strategy <- function(test_AB_strategy){
   }
   keep <- c("headphones", "loudspeaker")
   if(length(test_AB_strategy) > 2){
-    keep  <- test_AB_strategy
+    keep  <- strsplit(test_AB_strategy, ",") %>% unlist()
   }
   list(includes = include_testAB, operator = operator, keep = keep)
 }
@@ -25,20 +25,18 @@ test_device <- function(test_AB_strategy, invert = F){
     ret <- TRUE
     #browser()
     results <- psychTestR::get_results(state, complete = F) %>% as_tibble()
+
     if("HALT.device" %in% names(results)){
-      if(length(test_AB_strategy) > 2){
-        if(!(results$HALT.device %in% test_AB_strategy[3])){
-          ret <- FALSE
-        }
-      }
+      ret <- results$HALT.device$correct
     }
+
     if(invert) ret <- !ret
     ret
   }
 }
 get_device <- function(parseAB){
   function(state,...){
-    browser()
+
     a_correct <- psychTestR::get_local("po6_num_correct", state)
     if(!is.null(a_correct)){
       a_correct <- a_correct >= 3
@@ -65,33 +63,52 @@ get_device <- function(parseAB){
       }
 
     }
-    psychTestR::save_result(place = state, label = "device", value = device)
+    correct <- device %in% parseAB$keep
+    value <- tibble(label = "device", raw_answer = sprintf("%d;%d", a_correct, b_correct), answer = device, correct = correct)
+    #browser()
+    psychTestR::save_result(place = state, label = "device", value = value)
   }
 }
-main_test <- function(label, audio_dir, test_AB_strategy, dict= HALT::HALT_dict) {
+
+main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= HALT::HALT_dict) {
   parseAB <-  parse_testAB_strategy(test_AB_strategy)
-  if(sum(parseAB$includes) == 0){
+  if(sum(parseAB$includes) == 0L){
     stop("Must include at least one of A or B")
   }
   elts <- psychTestR::join(
     page_po1(audio_dir),
-    page_force_correct(2, audio_dir),
-    page_calibrate(3, audio_dir),
+    page_force_correct(2L, max_count, audio_dir),
+    psychTestR::conditional(
+      test = function(state, ...){
+        counter <- psychTestR::get_local("po2_counter", state)
+        answer <- psychTestR::get_local("po2", state)
+
+        counter >= max_count && !stringr::str_detect(answer, "correct")
+      },
+      logic = HALT_stop_page(dict)),
+    page_calibrate(3L,  audio_dir),
     page_po4(audio_dir),
-    page_force_correct(5, audio_dir),
-    if(parseAB$includes["A"]) page_testAB(6, audio_dir),
-    if(parseAB$includes["B"]) page_testAB(7, audio_dir),
+    page_force_correct(5L, max_count, audio_dir),
+    psychTestR::conditional(
+      test = function(state, ...){
+        counter <- psychTestR::get_local("po5_counter", state)
+        answer <- psychTestR::get_local("po5", state)
+
+        counter >= max_count && !stringr::str_detect(answer, "correct")
+      },
+      logic = HALT_stop_page(dict)),
+    if(parseAB$includes["A"]) page_testAB(6L, audio_dir),
+    if(parseAB$includes["B"]) page_testAB(7L, audio_dir),
     psychTestR::code_block(
       get_device(parseAB)
     ),
     psychTestR::conditional(test = test_device(test_AB_strategy, invert = T),
-                            logic = HALT_finished_page(dict)),
+                            logic = HALT_stop_page(dict)),
     psychTestR::conditional(test = test_device(test_AB_strategy),
-                            logic = page_calibrate(8, audio_dir)),
-    page_calibrate(8, audio_dir),
-    page_calibrate(9, audio_dir),
-    page_calibrate(10, audio_dir),
-    page_calibrate(11, audio_dir)
+                            logic = page_calibrate(8L, audio_dir)),
+    page_calibrate(9L, audio_dir),
+    page_calibrate(10L, audio_dir),
+    page_calibrate(11L, audio_dir)
   )
   elts
 }

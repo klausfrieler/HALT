@@ -18,9 +18,10 @@ Imports:
     tidyverse (>= 1.2.1),
     dplyr,
     purrr,
-    tibble
+    tibble,
+    stringr
 Suggests:
     codetools,
     devtools (>= 1.13.6)
 Remotes: pmcharrison/psychTestR
-RoxygenNote: 7.1.1
+RoxygenNote: 7.0.2

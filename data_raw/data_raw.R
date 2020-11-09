@@ -40,7 +40,7 @@ item_bank <- read.csv("data_raw/item_bank.csv", sep  =";", stringsAsFactors = F)
               select(stimulus_id, audio_file = value), by = "stimulus_id")
 item_bank[item_bank$stimulus_id == "po4",]$audio_file <- "Po4.png"
 
-usethis::use_data(item_bank, overwrite = TRUE)
+usethis::use_data(item_bank, overwrite = TRUE, internal = TRUE)
 
 HLT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
 
