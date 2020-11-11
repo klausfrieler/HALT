@@ -69,9 +69,9 @@ HALT_stop_page <- function(dict = HALT::HALT_dict){
   psychTestR::new_timeline(
     psychTestR::final_page(
       body = shiny::div(
-        shiny::h4(psychTestR::i18n("STOP_HEAD")),
+        shiny::h4(psychTestR::i18n("STOP_HEAD"), style = "margin-left:25%;display:block;text-align:left"),
         shiny::div(psychTestR::i18n("STOP_TEXT"),
-                   style = "margin-left:0%;display:block")
+                   style = "margin-left:25%;margin-right:25%;display:block;text-align:left")
       )
     ), dict = dict)
 }
