@@ -1,9 +1,5 @@
 library(tidyverse)
 library(psychTestR)
-#source("R/options.R")
-#source("R/main_test.R")
-#source("R/item_page.R")
-#source("R/utils.R")
 
 #' HALT
 #'
@@ -59,7 +55,7 @@ HALT_manipulation_check <- function(label = "HALT_MC",
   audio_dir <- gsub("/$", "", audio_dir)
   psychTestR::join(
     psychTestR::begin_module(label),
-    page_calibrate(12, audio_dir),
+    page_calibrate(12L, num_pages, audio_dir),
     psychTestR::elt_save_results_to_disk(complete = TRUE),
     psychTestR::end_module())
 }
