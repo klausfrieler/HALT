@@ -29,3 +29,20 @@ is.null.or <- function(x, f) {
   is.null(x) || f(x)
 }
 
+format_answer <- function(type = "data.frame", ...){
+  if(type == "data.frame"){
+    data.frame(..., stringsAsFactors = F)
+  }
+  else if(type == "tibble"){
+    tibble::tibble(...)
+  }
+  else if(type == "list"){
+    list(...)
+  }
+  else if (type == "vector"){
+    c(...)
+  }
+  else{
+    stop(sprintf("Invalid answer format %s", type))
+    }
+}

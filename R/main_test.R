@@ -15,7 +15,7 @@ parse_testAB_strategy <- function(test_AB_strategy){
   }
   keep <- c("headphones", "loudspeaker")
   if(length(test_AB_strategy) > 2){
-    keep  <- strsplit(test_AB_strategy, ",") %>% unlist()
+    keep  <- strsplit(test_AB_strategy[3], ",") %>% unlist()
   }
   list(includes = include_testAB, operator = operator, keep = keep)
 }
@@ -64,9 +64,10 @@ get_device <- function(parseAB){
 
     }
     correct <- device %in% parseAB$keep
-    value <- data.frame(raw_answer = sprintf("A:%s;B:%s", as.character(a_correct), as.character(b_correct)),
-                    answer = device,
-                    correct = correct, stringsAsFactors = F)
+    value <- format_answer(HALT_answer_format,
+                           raw_answer = sprintf("A:%s;B:%s", as.character(a_correct), as.character(b_correct)),
+                           answer = device,
+                           correct = correct)
     #browser()
     psychTestR::save_result(place = state, label = "device", value = value)
   }
@@ -81,15 +82,15 @@ main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= 
   num_pages <- 10 + num_AB_tests
   elts <- psychTestR::join(
     page_po1(audio_dir, num_pages),
-    #page_force_correct(2L, num_pages, max_count, audio_dir),
-    #psychTestR::conditional(
-    #  test = function(state, ...){
-    #    counter <- psychTestR::get_local("po2_counter", state)
-    #    answer <- psychTestR::get_local("po2", state)
-    #    counter >= max_count && !stringr::str_detect(answer, "correct")
-    #  },
-    #  logic = HALT_stop_page(dict)),
-    #page_calibrate(3L, num_pages,  audio_dir),
+    page_force_correct(2L, num_pages, max_count, audio_dir),
+    psychTestR::conditional(
+      test = function(state, ...){
+        counter <- psychTestR::get_local("po2_counter", state)
+        answer <- psychTestR::get_local("po2", state)
+        counter >= max_count && !stringr::str_detect(answer, "correct")
+      },
+      logic = HALT_stop_page(dict)),
+    page_calibrate(3L, num_pages,  audio_dir),
     page_po4(audio_dir, num_pages, max_count),
     psychTestR::conditional(
       test = function(state, ...){

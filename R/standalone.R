@@ -59,12 +59,6 @@ HALT_standalone  <- function(title = NULL,
                test_AB_strategy = test_AB_strategy,
                dict = dict,
                ...),
-    psychTestR::code_block(function(state, ...){
-      browser()
-      res <- psychTestR::get_results(state, complete = T) %>% as.list() %>% as_tibble()
-      #psychTestR::save_result(state, "HALT", res)
-      #res <- psychTestR::get_results(state, complete = T)
-    }),
     psychTestR::elt_save_results_to_disk(complete = TRUE),
     psychTestR::final_page(body = "")
   )
