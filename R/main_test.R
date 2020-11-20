@@ -36,7 +36,7 @@ test_device <- function(test_AB_strategy, invert = F){
 
 get_device <- function(parseAB){
   function(state,...){
-
+    #browser()
     a_correct <- psychTestR::get_local("po6_num_correct", state)
     if(!is.null(a_correct)){
       a_correct <- a_correct >= 3
@@ -79,7 +79,7 @@ main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= 
   if(num_AB_tests == 0L){
     stop("Must include at least one of A or B")
   }
-  num_pages <- 10 + num_AB_tests
+  num_pages <- 9 + 4 * num_AB_tests
   elts <- psychTestR::join(
     page_po1(audio_dir, num_pages),
     page_force_correct(2L, num_pages, max_count, audio_dir),
@@ -91,7 +91,7 @@ main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= 
       },
       logic = HALT_stop_page(dict)),
     page_calibrate(3L, num_pages,  audio_dir),
-    page_po4(audio_dir, num_pages, max_count),
+    page_po4(audio_dir, max_count, num_pages),
     psychTestR::conditional(
       test = function(state, ...){
         #browser()
@@ -108,8 +108,10 @@ main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= 
         counter >= max_count && !stringr::str_detect(answer, "correct")
       },
       logic = HALT_stop_page(dict)),
-    if(parseAB$includes["A"]) page_testAB(6L, num_pages, audio_dir),
-    if(parseAB$includes["B"]) page_testAB(7L, num_pages, audio_dir),
+    #if(parseAB$includes["A"]) page_testAB(6L, num_pages, audio_dir),
+    #if(parseAB$includes["B"]) page_testAB(7L, num_pages, audio_dir),
+    if(parseAB$includes["A"]) page_AB_section(6L, num_pages, audio_dir),
+    if(parseAB$includes["B"]) page_AB_section(7L, num_pages, audio_dir),
     psychTestR::code_block(
       get_device(parseAB)
     ),

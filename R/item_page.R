@@ -71,7 +71,6 @@ translate_answer <- function(raw_answer, correct_answer, page_no, sub_id){
                         "po11" = c("frequency not heard", "frequency not heard", "frequency heard"),
                         "po12" = c("descreased", "increased", "no manipulation")
   )
-  #browser()
   page_label <- sprintf("po%d", page_no)
   correct_answers <- as.numeric(strsplit(correct_answer, ",") %>% unlist())
   min_val <- min(correct_answers)
@@ -115,7 +114,6 @@ volume_calibration_page <- function (url, type = tools::file_ext(url), prompt = 
   else{
     prompt <- shiny::div(prompt, shiny::p(""), style = style)
   }
-  #browser()
   psychTestR::audio_NAFC_page(label = "volume_calibration", prompt = prompt,
                   choices = button_text, save_answer = FALSE, on_complete = on_complete,
                   url = url, type = type, wait = TRUE, loop = FALSE, admin_ui = admin_ui,
@@ -137,7 +135,6 @@ audio_text_page <- function(page_no,
   label <- sprintf("po%d%s", page_no, sub_id)
   #messagef("Page no: %d, sub id = %s, correct: %s", page_no, sub_id, correct_answer)
   get_answer <- function(input, state, ...) {
-    #browser()
     raw_answer <- as.numeric(gsub("answer", "", input$text_input))
     answer <- translate_answer(raw_answer, correct_answer, page_no, sub_id)
     psychTestR::set_local(key = substr(label, 1, 3), value = answer, state = state)
@@ -166,7 +163,6 @@ audio_text_page <- function(page_no,
     response_ui
   )
   #messagef("Created page %s (CONTINUE = %s)", label, psychTestR::i18n("CONTINUE"))
-
   psychTestR::page(ui = ui, label = label,  get_answer = get_answer, save_answer = save_answer,
                    validate = validate, on_complete = on_complete, final = FALSE,
                    admin_ui = admin_ui)
@@ -203,6 +199,7 @@ local_audio_NAFC_page <- function (label, prompt, choices, url, labels = NULL, t
 HALT_audio_NAFC_page <- function(page_no,
                                  sub_id,
                                  num_pages,
+                                 test_AB_offset,
                                  audio_dir,
                                  save_answer = TRUE,
                                  admin_ui = NULL){
@@ -211,14 +208,13 @@ HALT_audio_NAFC_page <- function(page_no,
   audio_url <- get_audio_url(audio_dir, page_no, sub_id)
   correct_answers <- get_item(page_no, sub_id, "correct_answer")
   #messagef("Page no: %d, sub id = %s, correct: %s", page_no, sub_id, correct_answers)
-  prompt <- shiny::div(get_page_counter(page_no, num_pages),
+  prompt <- shiny::div(get_page_counter(page_no, num_pages, test_AB_offset),
                        shiny::div(
                          psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)),
                          label,
                          style  = HALT_standard_style),
                        shiny::p(""))
   on_complete <- function(answer, state, ...) {
-    #browser()
     correct_answers <- as.numeric(strsplit(correct_answers, ",") %>% unlist())
     raw_answer <- as.numeric(answer)
     correct <- as.integer(raw_answer %in% correct_answers)
@@ -250,7 +246,6 @@ get_seed <-function(state, page_no){
 
 select_stimulus <- function(page_no, sub_id, num_stimuli = 3L){
   function(state, ...){
-    #browser()
     seed <-  get_seed(state, page_no)
     set.seed(seed)
     selection <- sample(letters[1:num_stimuli], 1L)
@@ -260,7 +255,6 @@ select_stimulus <- function(page_no, sub_id, num_stimuli = 3L){
 
 select_AB_page <- function(page_no, sub_id){
   function(state, ...){
-    #browser()
     seed <-  get_seed(state, page_no)
     set.seed(seed)
     selection <- sample(c("a", "a", "b", "b"))
@@ -284,20 +278,52 @@ select_AB_page <- function(page_no, sub_id){
 }
 
 get_item <- function(page_no, sub_id = "", column){
-  if(page_no == 5 && column == "correct_answer"){
-    #browser()
-  }
   item_bank %>% filter(stimulus_id == sprintf("po%d%s", page_no, sub_id)) %>% pull(!!rlang::sym(column))
 }
 
 get_audio_url <- function(audio_dir = "https://media.gold-msi.org/test_materials/HLT", page_no, sub_id){
   file.path(audio_dir, get_item(page_no, sub_id, "audio_file"))
 }
+test_page_counter <- function(){
+  num_pages <- 17
+  for(i in 1:12){
+    if(i == 6 || i == 7){
+      for(j in 0:3){
+        get_page_counter(i, num_pages, j)
 
-get_page_counter <- function(page_no, num_pages){
-  if(num_pages == 11 && page_no > 7 ){
-    page_no <- page_no + 1
+      }
+    }
+    else {
+      get_page_counter(i, num_pages, 0L)
+    }
   }
+}
+get_page_counter <- function(page_no, num_pages, test_AB_offset = 0L){
+  orig_page <- page_no
+  if(page_no == 7){
+    #browser()
+  }
+  if(num_pages == 13L){
+    if(orig_page > 7L ){
+      page_no <- orig_page + 2L
+    }
+    else if(orig_page == 6L || orig_page == 7L){
+      page_no <- orig_page + test_AB_offset
+    }
+    if(orig_page == 7){
+      page_no <- page_no - 1
+    }
+  }
+  if(num_pages == 17L){
+    if(orig_page > 7L ){
+      page_no <- orig_page + 6L
+    }
+    if(orig_page == 6L || orig_page == 7L){
+      page_no <- 6L  + test_AB_offset + 4L*(orig_page == 7L)
+    }
+
+  }
+  messagef("Page_no: %d, num_pages: %d, offset: %d, page_no: %d", orig_page, num_pages, test_AB_offset, page_no)
   shiny::tags$p(psychTestR::i18n("PAGE_COUNTER", sub = c(page_no = page_no, num_pages = num_pages)),
                 style = "text-align:center;color:#136575;font-size:10pt")
 }
@@ -310,32 +336,32 @@ warning_page <- function(label, warning_message){
 }
 
 HALT_base_page <- function(page_no, sub_id, num_pages, audio_dir, save_answer = T){
-  psychTestR::new_timeline(
-    audio_text_page(page_no, sub_id,
-                    prompt = shiny::div(get_page_counter(page_no, num_pages),
-                                        shiny::div(psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)),
-                                                   style = HALT_standard_style),
-                                        shiny::p("")),
-                    audio_url = get_audio_url(audio_dir, page_no, sub_id),
-                    correct_answer = get_item(page_no, sub_id, "correct_answer"),
-                    save_answer = save_answer),
-    dict = HALT::HALT_dict)
+  audio_text_page(page_no, sub_id,
+                  prompt = shiny::div(get_page_counter(page_no, num_pages),
+                                      shiny::div(psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)),
+                                                 style = HALT_standard_style),
+                                      shiny::p("")),
+                  audio_url = get_audio_url(audio_dir, page_no, sub_id),
+                  correct_answer = get_item(page_no, sub_id, "correct_answer"),
+                  save_answer = save_answer)
 }
+
 
 HALT_random_stimulus_page <- function(page_no, num_pages, audio_dir, save_answer = TRUE){
-  psychTestR::join(
-      psychTestR::conditional(test = select_stimulus(page_no, "a"),
-                              logic = HALT_base_page(page_no, "a", num_pages, audio_dir, save_answer)),
-      psychTestR::conditional(test = select_stimulus(page_no, "b"),
-                              logic = HALT_base_page(page_no, "b", num_pages, audio_dir, save_answer)),
-      psychTestR::conditional(test = select_stimulus(page_no, "c"),
-                              logic = HALT_base_page(page_no, "c", num_pages, audio_dir, save_answer)))
+  psychTestR::new_timeline(
+    psychTestR::join(
+      psychTestR::code_block(function(state, ...){
+        psychTestR::set_local("current_selection", sample(letters[1:3], 1L), state)
+      }),
+      psychTestR::reactive_page(function(state, ...){
+        selection <- psychTestR::get_local("current_selection", state)
+        HALT_base_page(page_no, selection, num_pages, audio_dir, save_answer)
+      }))
+    , dict = HALT::HALT_dict)
 }
-
 
 test_answer <- function(page_no, value, invert = F){
   function(state, ...){
-    #browser()
     answer <- psychTestR::get_local(sprintf("po%d", page_no), state)
     ret <- !is.null(answer) && answer == value
     if(invert){
@@ -372,7 +398,6 @@ test_force_loop <- function(page_no, max_count, correct_answer = "correct"){
       #messagef("Force loop: Page_no %d, current answer: '%s'", page_no, answer)
 
     }
-    #browser()
     cond1 <- is.null(answer) || !stringr::str_detect(answer, correct_answer)
     cond2 <- as.integer(counter) < max_count
     #messagef("Force loop: Cond1 %s, cond2 %s, total cond %s", cond1, cond2, cond1 && cond2)
@@ -394,7 +419,6 @@ page_po1 <- function(audio_dir, num_pages){
 
 select_left_right <- function(direction){
   function(state, ...){
-    #browser()
     seed <-  get_seed(state, 0L)
     set.seed(seed)
     selection <- sample(c("left", "right"), 1L)
@@ -408,10 +432,8 @@ left_right_page <- function(audio_dir, right_first, num_pages){
   if(right_first){
     perm <- c(2L, 1L)
   }
-  #browser()
   img_url <- gsub("mp3", "png", get_audio_url(audio_dir = audio_dir, page_no = 4L, sub_id = ""))
   on_complete <- function(answer, state, ...){
-    #browser()
     counter <- psychTestR::get_local(key = "po4_counter", state = state)
     psychTestR::set_local(key = "po4_counter", value = counter + 1, state = state)
 
@@ -482,24 +504,25 @@ page_calibrate <- function(page_no, num_pages, audio_dir){
   HALT_random_stimulus_page(page_no, num_pages, audio_dir = audio_dir, save_answer = T)
 }
 
-page_testAB_base <- function(page_no, sub_id, num_pages, audio_dir, save_answer = T){
+page_testAB_base <- function(page_no, sub_id, num_pages, test_AB_offset, audio_dir, save_answer = T){
   psychTestR::new_timeline(
-    HALT_audio_NAFC_page(page_no, sub_id, num_pages, audio_dir  = audio_dir, save_answer = save_answer),
+    HALT_audio_NAFC_page(page_no, sub_id, num_pages, test_AB_offset, audio_dir  = audio_dir, save_answer = save_answer),
     dict = HALT::HALT_dict)
 }
 
-page_testAB_wrapper <- function(page_no, num_pages, audio_dir, save_answer = TRUE){
+page_testAB_wrapper <- function(page_no, num_pages, test_AB_offset, audio_dir, save_answer = TRUE){
   psychTestR::join(
     psychTestR::conditional(test = select_AB_page(page_no, "a"),
-                            logic = page_testAB_base(page_no, "a", num_pages, audio_dir, save_answer)),
+                            logic = page_testAB_base(page_no, "a", num_pages, test_AB_offset, audio_dir, save_answer)),
     psychTestR::conditional(test = select_AB_page(page_no, "b"),
-                            logic = page_testAB_base(page_no, "b", num_pages, audio_dir, save_answer)))
+                            logic = page_testAB_base(page_no, "b", num_pages, test_AB_offset, audio_dir, save_answer)))
 }
 
 page_testAB <- function(page_no, num_pages, audio_dir){
-  AB_pages <-   lapply(1:4L,  function(sub_id)
-    page_testAB_wrapper(page_no, num_pages, audio_dir = audio_dir, save_answer = T)
-  ) %>% psychTestR::join()
+  AB_pages <-   lapply(1:4L,  function(sub_id){
+    page_testAB_wrapper(page_no, num_pages, test_AB_offset = sub_id - 1, audio_dir = audio_dir, save_answer = T)
+  }) %>% psychTestR::join()
+
   psychTestR::join(
     psychTestR::code_block(
       function(state, ...){
@@ -509,5 +532,65 @@ page_testAB <- function(page_no, num_pages, audio_dir){
     ),
     AB_pages
   )
+}
 
+page_testAB_wrapper <- function(page_no, num_pages, audio_dir, save_answer = TRUE){
+  psychTestR::new_timeline(
+    psychTestR::join(
+      psychTestR::code_block(function(state, ...){
+        psychTestR::set_local("current_selection", sample(letters[1:3], 1L), state)
+      }),
+      psychTestR::reactive_page(function(state, ...){
+        selection <- psychTestR::get_local("current_selection", state)
+        HALT_base_page(page_no, selection, num_pages, audio_dir, save_answer)
+      })), dict = HALT::HALT_dict)
+}
+
+page_AB_section2 <- function(page_no, num_pages, audio_dir){
+  psychTestR::join(
+    psychTestR::code_block(
+      function(state, ...){
+        psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = 0L, state)
+        selection <- sample(c("a", "a", "b", "b"))
+        psychTestR::set_local(key = sprintf("po%d_selection", page_no), value = selection, state)
+      }
+    ),
+
+    psychTestR::while_loop(
+      test = test_counter(page_no, 4L),
+      logic = psychTestR::reactive_page(function(state, ...){
+          selection <- psychTestR::get_local(sprintf("po%d_selection", page_no), state)
+          counter <- psychTestR::get_local(sprintf("po%d_counter", page_no), state)
+          psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = counter+1, state)
+          HALT_audio_NAFC_page(page_no, selection[counter+1], num_pages, counter, audio_dir = audio_dir, save_answer = T)
+        }
+      ))%>% psychTestR::new_timeline(dict = HALT::HALT_dict))
+}
+page_AB_section <- function(page_no, num_pages, audio_dir){
+  psychTestR::new_timeline(
+    psychTestR::join(
+      psychTestR::code_block(
+        function(state, ...){
+          selection <- sample(c("a", "a", "b", "b"))
+          psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = 1L, state = state)
+          psychTestR::set_local(key = sprintf("po%d_selection", page_no), value = selection, state)
+          psychTestR::set_local(key = sprintf("po%d_num_correct", page_no), value = 0L, state = state)
+        }
+      ),
+      psychTestR::reactive_page(function(state, ...){
+        selection <- psychTestR::get_local(sprintf("po%d_selection", page_no), state)
+        HALT_audio_NAFC_page(page_no, selection[1], num_pages, 0, audio_dir = audio_dir, save_answer = T)
+      }),
+      psychTestR::reactive_page(function(state, ...){
+        selection <- psychTestR::get_local(sprintf("po%d_selection", page_no), state)
+        HALT_audio_NAFC_page(page_no, selection[2], num_pages, 1, audio_dir = audio_dir, save_answer = T)
+      }),
+      psychTestR::reactive_page(function(state, ...){
+        selection <- psychTestR::get_local(sprintf("po%d_selection", page_no), state)
+        HALT_audio_NAFC_page(page_no, selection[3], num_pages, 2, audio_dir = audio_dir, save_answer = T)
+      }),
+      psychTestR::reactive_page(function(state, ...){
+        selection <- psychTestR::get_local(sprintf("po%d_selection", page_no), state)
+        HALT_audio_NAFC_page(page_no, selection[4], num_pages, 3, audio_dir = audio_dir, save_answer = T)
+      })), dict = HALT::HALT_dict)
 }
