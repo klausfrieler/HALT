@@ -465,7 +465,7 @@ page_force_correct <- function(page_no, num_pages, max_count = 3L, audio_dir){
                                 logic = warning_page(warning_label, "WARNING_IMPRECISE")),
         page_calibrate(page_no = page_no, num_pages, audio_dir = audio_dir, save_answer = T),
         psychTestR::code_block(function(state, ...){
-          psychTestR::counter <- get_local(key = sprintf("po%d_counter", page_no), state)
+          counter <- psychTestR::get_local(key = sprintf("po%d_counter", page_no), state)
           psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = counter + 1L, state)
         })
       )
