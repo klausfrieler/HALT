@@ -1,7 +1,7 @@
 Package: HALT
 Type: Package
 Title: Headphone and Loudspeaker Test
-Version: 0.3.0
+Version: 0.4.0
 Author: Klaus Frieler, Yves Wycisk
 Maintainer: Klaus Frieler <kf@omniversum.de>
 Description: Implementation of a headphone and loudspeaker detection test for online experiment.
@@ -19,9 +19,10 @@ Imports:
     dplyr,
     purrr,
     tibble,
-    stringr
+    stringr,
+    RAT
 Suggests:
     codetools,
     devtools (>= 1.13.6)
-Remotes: pmcharrison/psychTestR
+Remotes: pmcharrison/psychTestR, klausfrieler/RAT
 RoxygenNote: 7.0.2

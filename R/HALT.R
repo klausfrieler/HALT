@@ -49,15 +49,18 @@ HALT <- function(label = "HALT",
 #' @export
 HALT_manipulation_check <- function(label = "HALT_MC",
                                     audio_dir = "https://media.gold-msi.org/test_materials/HLT",
-                                    dict = HALT::HALT_dict){
+                                    dict = HALT::HALT_dict,
+                                    final = TRUE,
+                                    final_text = shiny::h4("Thank you for participating")){
   stopifnot(purrr::is_scalar_character(label))
   stopifnot(purrr::is_scalar_character(audio_dir))
   audio_dir <- gsub("/$", "", audio_dir)
   psychTestR::join(
     psychTestR::begin_module(label),
-    page_calibrate(12L, num_pages, audio_dir),
+    page_calibrate(12L, num_pages = 0, audio_dir),
     psychTestR::elt_save_results_to_disk(complete = TRUE),
-    psychTestR::end_module())
+    psychTestR::end_module(),
+    if(final) psychTestR::final_page(body = final_text))
 }
 
 

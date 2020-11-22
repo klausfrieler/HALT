@@ -1,3 +1,7 @@
+# HALT 0.4.0
+
+* Second beta version, refactoring, new HALT_demo() (needs RAT)
+
 # HALT 0.3.0
 
 * First beta version
