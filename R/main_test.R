@@ -75,7 +75,7 @@ get_device <- function(parseAB){
 count_page <- function(){
   new_timeline(
   join(
-    code_block(function(state, ...) set_global("counter", 0L, state)),
+    psychTestR::code_block(function(state, ...) set_global("counter", 0L, state)),
     while_loop(
       test = function(state, ...) get_global("counter", state) < 3L,
       logic = join(

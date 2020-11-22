@@ -436,7 +436,7 @@ page_po4 <- function(audio_dir, max_count = 3L, num_pages){
     psychTestR::while_loop(
       test = test_force_loop(page_no = 4L, max_count, correct_answer = "left"),
       logic = psychTestR::join(
-        code_block(function(state,...){
+        psychTestR::code_block(function(state,...){
           counter <- psychTestR::get_local(key = "po4_counter", state = state)
           psychTestR::set_local(key = "po4_counter", value = counter + 1L, state = state)
         }),
@@ -466,7 +466,7 @@ page_force_correct <- function(page_no, num_pages, max_count = 3L, audio_dir){
         psychTestR::conditional(test = test_answer(page_no, "imprecise"),
                                 logic = warning_page(warning_label, "WARNING_IMPRECISE")),
         page_calibrate(page_no = page_no, num_pages, audio_dir = audio_dir, save_answer = T),
-        code_block(function(state, ...){
+        psychTestR::code_block(function(state, ...){
           counter <- get_local(key = sprintf("po%d_counter", page_no), state)
           psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = counter + 1L, state)
         })
@@ -507,7 +507,7 @@ page_AB_section <- function(page_no, num_pages, audio_dir){
             HALT_audio_NAFC_page(page_no, selection[counter + 1L], num_pages, counter, audio_dir = audio_dir, save_answer = T)
           }
         ),
-        code_block(function(state, ...) {
+        psychTestR::code_block(function(state, ...) {
           counter <- psychTestR::get_local(sprintf("po%d_counter", page_no), state)
           psychTestR::set_local(sprintf("po%d_counter", page_no), counter + 1L, state)
         })
