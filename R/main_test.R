@@ -26,7 +26,12 @@ test_device <- function(test_AB_strategy, invert = F){
     results <- psychTestR::get_results(state, complete = F) %>% as_tibble()
 
     if("HALT.device" %in% names(results)){
-      ret <- results$HALT.device$correct
+      if(is.scalar(results$HALT.device)){
+        ret <- results$HALT.device
+      }
+      else{
+        ret <- results$HALT.device$correct
+      }
     }
 
     if(invert) ret <- !ret
@@ -68,7 +73,6 @@ get_device <- function(parseAB){
                            raw_answer = sprintf("A:%s;B:%s", as.character(a_correct), as.character(b_correct)),
                            answer = device,
                            correct = correct)
-    #browser()
     psychTestR::save_result(place = state, label = "device", value = value)
   }
 }
@@ -98,6 +102,14 @@ main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= 
   num_pages <- 9 + 4 * num_AB_tests
   elts <- psychTestR::join(
     page_po1(audio_dir, num_pages),
+    psychTestR::code_block(
+      get_device(parseAB)
+    ),
+    psychTestR::conditional(test = test_device(test_AB_strategy, invert = T),
+                            logic = HALT_stop_page(dict)),
+    psychTestR::conditional(test = test_device(test_AB_strategy),
+                            logic = page_calibrate(8L, num_pages, audio_dir)),
+
     page_force_correct(2L, num_pages, max_count, audio_dir),
     psychTestR::conditional(
       test = function(state, ...){
