@@ -25,4 +25,4 @@ Suggests:
     codetools,
     devtools (>= 1.13.6)
 Remotes: pmcharrison/psychTestR, klausfrieler/RAT
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
