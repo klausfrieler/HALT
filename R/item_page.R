@@ -147,8 +147,6 @@ audio_text_page <- function(page_no,
     answer <- translate_answer(raw_answer, correct_answer, page_no, sub_id)
     psychTestR::set_local(key = substr(label, 1, 3), value = answer, state = state)
     counter <- as.numeric(psychTestR::get_local(key = sprintf("%s_counter", substr(label, 1, 3)), state = state))
-    #psychTestR::set_local(key = sprintf("%s_counter", substr(label, 1, 3)), value = counter + 1, state = state)
-    #messagef("Set %s_counter to %d", substr(label, 1, 3), counter + 1L)
     format_answer(HALT_answer_format,
                   raw_answer = as.character(raw_answer),
                   answer = answer,
@@ -467,7 +465,7 @@ page_force_correct <- function(page_no, num_pages, max_count = 3L, audio_dir){
                                 logic = warning_page(warning_label, "WARNING_IMPRECISE")),
         page_calibrate(page_no = page_no, num_pages, audio_dir = audio_dir, save_answer = T),
         psychTestR::code_block(function(state, ...){
-          counter <- get_local(key = sprintf("po%d_counter", page_no), state)
+          psychTestR::counter <- get_local(key = sprintf("po%d_counter", page_no), state)
           psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = counter + 1L, state)
         })
       )
