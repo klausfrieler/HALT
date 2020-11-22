@@ -72,7 +72,23 @@ get_device <- function(parseAB){
     psychTestR::save_result(place = state, label = "device", value = value)
   }
 }
-
+count_page <- function(){
+  new_timeline(
+  join(
+    code_block(function(state, ...) set_global("counter", 0L, state)),
+    while_loop(
+      test = function(state, ...) get_global("counter", state) < 3L,
+      logic = join(
+        reactive_page(function(state, ...) {
+          set_global("counter", 1L + get_global("counter", state), state)
+          one_button_page(
+            tags$div(
+              tags$p(tags$strong(sprintf("%i", get_global("counter", state)))),
+              tags$p(i18n("TESTNAME")))
+          )
+        })))
+  ), dict = HALT::HALT_dict)
+}
 main_test <- function(label, max_count = 3L, audio_dir, test_AB_strategy, dict= HALT::HALT_dict) {
   parseAB <-  parse_testAB_strategy(test_AB_strategy)
   num_AB_tests <- sum(parseAB$includes)

@@ -25,7 +25,7 @@ library(psychTestR)
 #' @export
 HALT <- function(label = "HALT",
                  max_count = 3,
-                 test_AB_strategy = c("AB", "or", "headphones"),
+                 test_AB_strategy = c("AB", "or", "headphones,loudspeaker"),
                  audio_dir = "https://media.gold-msi.org/test_materials/HLT",
                  dict = HALT::HALT_dict) {
   stopifnot(length(test_AB_strategy) == 3)
