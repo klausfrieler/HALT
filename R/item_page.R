@@ -112,7 +112,8 @@ get_audio_url <- function(audio_dir = "https://media.gold-msi.org/test_materials
   file.path(audio_dir, get_item(page_no, sub_id, "audio_file"))
 }
 
-volume_calibration_page <- function (url, type = tools::file_ext(url), prompt = NULL, style = "", button_text = "Next",
+volume_calibration_page <- function (url, type = tools::file_ext(url), prompt = NULL, style = "",
+                                     button_text = "Next",
                                      on_complete = NULL, admin_ui = NULL, btn_play_prompt = "Click here to play"){
   if (is.null(prompt))
     prompt <- shiny::div(shiny::p("You should hear some audio playing.",
@@ -417,9 +418,12 @@ page_po1 <- function(audio_dir, num_pages){
       url = get_audio_url(audio_dir, 1L, ""),
       prompt = shiny::div(get_page_counter(1L, num_pages),
                           shiny::div(psychTestR::i18n("THLT_0001_PROMPT"),
-                                     style = HALT_standard_style)),
+                                     style = HALT_standard_style),
+                          shiny::p("")),
       button_text  = psychTestR::i18n("THLT_0001_CHOICES"),
-      btn_play_prompt = ""),
+      btn_play_prompt = ""
+      #, wait = TRUE, loop = FALSE, show_controls = TRUE
+      ),
     dict = HALT::HALT_dict)
 }
 
