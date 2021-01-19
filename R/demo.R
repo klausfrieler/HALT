@@ -33,8 +33,7 @@ HALT_demo <- function(num_items = 3L,
              take_training = TRUE,
              feedback = feedback,
              dict = RAT::RAT_dict,
-             ...),
-   HALT::HALT_manipulation_check(dict = dict)
+             ...)
   )
 
   psychTestR::make_test(

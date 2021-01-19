@@ -10,14 +10,8 @@
 #' @param title (Scalar character) Title to display during testing. If \code{NULL}, \code{TESTNAME} from the dictionaly is used.
 #' @param with_id (Logical character) Should an id page be included at the beginning.
 #' @param max_count (Integer scalar) Maximum number to show page 2 and 3 before bailing out (defaults to  3).
-#' @param test_AB_strategy (character vector) Main configuration of the HALT. Test A and Test B can used alone
-#' or in conjunction to estimate the listening device of the test taker.
-#' This is indicated by the first string, which can contain "A" or "B" or both ("AB").
-#' If A and B are used then the next string indicates the operation how to
-#' combine the information from test A and B. It should be either "or" or "and".
-#' The third element contains a comma separated list of "headphones" and "loudspeaker", indicating
-#' which device is allowed. If the detected device does not match any of these then test will be interrupted with a
-#' warning message.
+#' @param config (object of class HALT_config) Use function auto_config() or make_config() to generate this.
+#' See also the documentation there for further explanations.
 #' @param admin_password (Scalar character) Password for accessing the admin panel.
 #' @param researcher_email (Scalar character)
 #' If not \code{NULL}, this researcher's email address is displayed
@@ -36,9 +30,7 @@
 HALT_standalone  <- function(title = NULL,
                             with_id = FALSE,
                             max_count = 3,
-                            test_AB_strategy = c(tests = "AB",
-                                                 condition = "or",
-                                                 keep = c("headphones,loudspeaker")),
+                            config = HALT::auto_config(),
                             admin_password = "HALTadmin",
                             researcher_email = "yves.wycisk@hmtm-hannover.de",
                             languages = c("en", "de"),
@@ -56,7 +48,7 @@ HALT_standalone  <- function(title = NULL,
     HALT::HALT(label = "HALT",
                max_count = max_count,
                audio_dir = audio_dir,
-               test_AB_strategy = test_AB_strategy,
+               config = config,
                dict = dict,
                ...),
     psychTestR::elt_save_results_to_disk(complete = TRUE),

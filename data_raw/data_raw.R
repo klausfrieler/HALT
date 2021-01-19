@@ -1,5 +1,7 @@
 library(tidyverse)
 
+usethis::use_build_ignore(c("material", "data_raw"))
+
 stimuli_map <- c(
 "Po1" = "Po1_12x_pink_noise_-46dBFS.mp3",
 "Po2A" =  "Po2A_3x_pink_noise_-1dBFS+4x_pink_noise_-46dBFS-count_7.mp3",
@@ -30,27 +32,42 @@ stimuli_map <- c(
 "Po11C" =	"Po11C_6x_20Hz_count_6.mp3",
 "Po12A" =	"Po12A_4x_pink_noise_-40dBFS+3x_pink_noise_-46dBFS+3x_pink_noise_-52dBFS-count_10.mp3",
 "Po12B" =	"Po12B_4x_pink_noise_-40dBFS+4x_pink_noise_-46dBFS+3x_pink_noise_-52dBFS-count_11.mp3",
-"Po12C" =	"Po12C_4x_pink_noise_-40dBFS+4x_pink_noise_-46dBFS+4x_pink_noise_-52dBFS-count_12.mp3")
+"Po12C" =	"Po12C_4x_pink_noise_-40dBFS+4x_pink_noise_-46dBFS+4x_pink_noise_-52dBFS-count_12.mp3",
+"Po13A" = "Wo1LPQ.wav",
+"Po13B" = "Wo2LQP.wav",
+"Po13C" = "Wo3PLQ.wav",
+"Po13D" = "Wo4PQL.wav",
+"Po13E" = "Wo5QLP.wav",
+"Po13F" = "Wo6QPL.wav"
+)
 
 item_bank <- read.csv("data_raw/item_bank.csv", sep  =";", stringsAsFactors = F) %>%
   as_tibble() %>%
   left_join(stimuli_map  %>%
               as_tibble() %>%
-              mutate(stimulus_id = tolower(names(stimuli_map)), value = sprintf("%s.mp3", names(stimuli_map))) %>%
-              select(stimulus_id, audio_file = value), by = "stimulus_id")
+              mutate(stimulus_id = tolower(names(stimuli_map)),
+                     value = sprintf("%s.mp3", names(stimuli_map))) %>%
+              dplyr::select(stimulus_id, audio_file = value), by = "stimulus_id")
 item_bank[item_bank$stimulus_id == "po4",]$audio_file <- "Po4.png"
+item_bank[item_bank$page_id == "po13",]$audio_file <- str_replace(item_bank[item_bank$page_id == "po13",]$audio_file, "mp3", "wav")
 
 usethis::use_data(item_bank, overwrite = TRUE, internal = TRUE)
 
+#'Internal configuration data
+#'
+test_config <- readRDS("data_raw/test_config.rds") %>% as_tibble()
+test_config$logic_expr <- str_replace(test_config$method, "Test ", "") %>%
+  str_replace("Test", "") %>%
+  str_replace(" HP", "") %>%
+  str_replace("OR", "||") %>%
+  str_replace("AND", "&&") %>%
+  str_replace("at least 1", "A || B || C") %>%
+  str_replace("at least 2", "(A && B) || (A && C ) || (B && C)") %>%
+  str_replace("all", "A && B && C")
+
+usethis::use_data(test_config, overwrite = TRUE, internal = TRUE)
+
+
 HLT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
-
-
-#HALT_dict_raw <- read.csv("data_raw/HLT_dict.csv",
-#                         sep = ";",
-#                         stringsAsFactors = F)  %>%
-#  mutate(de = gsub("[\n\r]", "", de),
-#         en = gsub("[\n\r]", "", en))
-#  mutate(de = gsub("\\\\", "\\ ", de, fixed = T),
-#         en = gsub("\\\\", "\\ ", en, fixed = T))
 HALT_dict <- HLT_dict_raw %>% psychTestR::i18n_dict$new()
 usethis::use_data(HALT_dict, overwrite = TRUE)

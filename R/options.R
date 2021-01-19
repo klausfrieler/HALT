@@ -1,3 +1,3 @@
-HALT_options <- function(test_AB_strategy,
+HALT_options <- function(config,
                         item_bank) {
 }
