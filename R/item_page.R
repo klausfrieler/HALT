@@ -105,7 +105,7 @@ translate_answer <- function(raw_answer, correct_answer, page_no, sub_id){
 }
 
 get_item <- function(page_no, sub_id = "", column){
-  HALT::item_bank %>% filter(stimulus_id == sprintf("po%d%s", page_no, sub_id)) %>% pull(!!rlang::sym(column))
+  item_bank %>% filter(stimulus_id == sprintf("po%d%s", page_no, sub_id)) %>% pull(!!rlang::sym(column))
 }
 
 get_audio_url <- function(audio_dir = "https://media.gold-msi.org/test_materials/HLT", page_no, sub_id){

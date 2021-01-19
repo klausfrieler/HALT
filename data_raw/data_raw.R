@@ -51,7 +51,7 @@ item_bank <- read.csv("data_raw/item_bank.csv", sep  =";", stringsAsFactors = F)
 item_bank[item_bank$stimulus_id == "po4",]$audio_file <- "Po4.png"
 item_bank[item_bank$page_id == "po13",]$audio_file <- str_replace(item_bank[item_bank$page_id == "po13",]$audio_file, "mp3", "wav")
 
-usethis::use_data(item_bank, overwrite = TRUE, internal = TRUE)
+usethis::use_data(item_bank, overwrite = TRUE)
 
 #'Internal configuration data
 #'
