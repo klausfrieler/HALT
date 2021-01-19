@@ -21,6 +21,7 @@
 #'
 HALT_demo <- function(num_items = 3L,
                      feedback = NULL,
+                     config = HALT::auto_config(use_scc = T),
                      admin_password = "demo",
                      researcher_email = "",
                      dict = HALT::HALT_dict,
@@ -33,7 +34,8 @@ HALT_demo <- function(num_items = 3L,
              take_training = TRUE,
              feedback = feedback,
              dict = RAT::RAT_dict,
-             ...)
+             ...),
+    psychTestR::final_page(body = "")
   )
 
   psychTestR::make_test(
