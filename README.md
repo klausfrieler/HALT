@@ -56,12 +56,8 @@ library(HALT)
 
 # Run the test as if for a participant, using default settings,
 # saving data, and with a custom admin password
-# You can specify a strategy how to use the test A and B in the HALT using a 
-# vector like test_AB_strategy  = c(tests = "AB", condition = "or", devices = "headphones"),
-# where the first component is a string that should contain A, B or A and B to specifcy, which tests to include
-# the second component can be "or" or "and" and indicates the strategy to use information from one or both tests #(ignored if only one test is used), and the third component is a string, which device is admitted. Non-admitted
-# devices will result in ending the test immediately. If the third component is missing, all devices will be allowed.
-HALT_standalone(test_AB_strategy, admin_password = "put-your-password-here")
+# You can specify a strategy how to use the test A, B  and C using a config object, which you can create using auto_config() and make_config()
+HALT_standalone(config, admin_password = "put-your-password-here")
 ```
 
 You will need to enter a participant ID for each participant.
