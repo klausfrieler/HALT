@@ -66,7 +66,7 @@ test_config$logic_expr <- str_replace(test_config$method, "Test ", "") %>%
   str_replace("at least 2", "(A && B) || (A && C ) || (B && C)") %>%
   str_replace("all", "A && B && C")
 
-usethis::use_data(test_config, overwrite = TRUE, internal = TRUE)
+usethis::use_data(test_config, overwrite = TRUE)
 
 
 HALT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
