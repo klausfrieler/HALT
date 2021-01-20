@@ -40,7 +40,8 @@ stimuli_map <- c(
 "Po13E" = "Wo5QLP.wav",
 "Po13F" = "Wo6QPL.wav"
 )
-
+#'Internal item bank
+#'
 item_bank <- read.csv("data_raw/item_bank.csv", sep  =";", stringsAsFactors = F) %>%
   as_tibble() %>%
   left_join(stimuli_map  %>%
@@ -68,6 +69,6 @@ test_config$logic_expr <- str_replace(test_config$method, "Test ", "") %>%
 usethis::use_data(test_config, overwrite = TRUE, internal = TRUE)
 
 
-HLT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
-HALT_dict <- HLT_dict_raw %>% psychTestR::i18n_dict$new()
+HALT_dict_raw <- readxl::read_xlsx("data_raw/HLT_dict.xlsx", trim_ws = T)
+HALT_dict <- HALT_dict_raw %>% psychTestR::i18n_dict$new()
 usethis::use_data(HALT_dict, overwrite = TRUE)
