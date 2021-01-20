@@ -501,7 +501,7 @@ page_ABC_section <- function(page_no, num_pages, audio_dir){
         function(state, ...){
           psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = 0L, state)
           if(page_no == 13L){
-            selection <- letters[1:6]
+            selection <- sample(letters[1:6])
           }
           else{
             selection <- sample(c("a", "a", "a", "b", "b", "b"))
