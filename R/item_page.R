@@ -483,7 +483,10 @@ page_calibrate <- function(page_no, num_pages, audio_dir, save_answer = T){
   psychTestR::new_timeline(
     psychTestR::join(
       psychTestR::code_block(function(state, ...){
-        psychTestR::set_local("current_selection", sample(letters[1:3], 1L), state)
+        selection <- psychTestR::get_local("current_selection", state)
+        if(is.null(selection)){
+          psychTestR::set_local("current_selection", sample(letters[1:3], 1L), state)
+        }
       }),
       psychTestR::reactive_page(function(state, ...){
         selection <- psychTestR::get_local("current_selection", state)
