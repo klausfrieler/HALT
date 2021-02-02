@@ -20,8 +20,6 @@ See also the documentation there for further explanations.}
 \item{audio_dir}{(url). The URL of the directory containing the stimuli.}
 
 \item{dict}{The psychTestR dictionary used for internationalisation.}
-
-\item{max_count}{(Integer scalar) Maximum number to show page 2 and 3 before bailing out (defaults to  3).}
 }
 \description{
 This function defines a HALT  module for incorporation into a

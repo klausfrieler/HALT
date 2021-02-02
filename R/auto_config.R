@@ -11,52 +11,63 @@
 #' @param devices Sets the desired playback device. Possible settings are
 #' \code{"HP"} for headphones or \code{"LS"} for loudspeakers.
 #'
-#' @param use_scc (boolean, default = F) Flag wether Splice, Convice. Compare page shall be shown.
+#' @param use_scc (boolean, default = F) Flag whether "Splice, Convice. Compare" page shall be shown.
+#' @param loop_exclude (integer, default = 5) Number of loops for item po2.
+#' @param lr_img_exclude (boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusiogn.
+#' @param lr_audio_exclude (boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusiogn.
+#' @param devices_exclude (boolean, default = T) Flag, if wrong answer on left-right device question shall lead to exclusiogn.
 #' @references
 #' \insertRef{HALTpaper}{HALT}
 #' @export
 #'
 auto_config <- function(baserate_hp = 211/1194,
                         devices = "HP",
-                        use_scc = F) {
-  stopifnot(devices %in% c("HP", "LS"),
-            length(devices) == 1,
+                        use_scc = FALSE,#
+                        loop_exclude = 5L,
+                        lr_img_exclude = TRUE,
+                        lr_audio_exclude = TRUE,
+                        devices_exclude = TRUE
+                        ) {
+  stopifnot(all(devices %in% c("HP","LS")),
+            length(devices) <= 2,
             is.numeric(baserate_hp),
             length(baserate_hp) == 1,
             baserate_hp < 1,
-            baserate_hp > 0)
+            baserate_hp > 0,
+            loop_exclude > 0)
 
   tests <- HALT::test_config  %>% filter(true_ls_rate > 0.5, true_hp_rate > 0.5)
 
-  tests$hp_prevalence <-
+  tests$hp_pv <-
     baserate_hp * tests$true_hp_rate / (baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$false_hp_rate)
-  tests$ls_prevalence <-
+  tests$ls_pv <-
     (1 - baserate_hp) * tests$true_ls_rate / ((1 - baserate_hp) * tests$true_ls_rate + baserate_hp * tests$false_ls_rate)
   tests$utility <-
     baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$true_ls_rate
   tests <- tests %>% filter(utility == max(utility))
 
-  if(devices == "HP") {
+  if("HP" %in% devices) {
     tests <- tests %>%
-      filter(tests$hp_prevalence == max(tests$hp_prevalence)) %>%
-      filter(tests$ls_prevalence == max(tests$ls_prevalence))
+      filter(tests$hp_pv == max(tests$hp_pv)) %>%
+      filter(tests$ls_pv == max(tests$ls_pv))
   } else {
     tests <- tests %>%
-      filter(tests$ls_prevalence == max(tests$ls_prevalence)) %>%
-      filter(tests$hp_prevalence == max(tests$hp_prevalence))
+      filter(tests$ls_pv == max(tests$ls_pv)) %>%
+      filter(tests$hp_pv == max(tests$hp_pv))
+  }
+  if(length(devices) > 1){
+    use_scc <- FALSE
+    device_exclude <- FALSE
   }
 
-  #method <- tests[1,2]
-
-  #A <- tests[1,4] # Bilsen
-  #B <- tests[1,3] # Franssen
-  #C <- tests[1,5] # Woods
-  #config <- list("method" = method, "A" = A, "B" = B, "C" = C, "baserate_hp" = baserate_hp, "devices" = devices)
-  config <- tests[1,] %>% dplyr::select(method = method_code,
-                                 A = A,
-                                 B = B,
-                                 C = C) %>%
-    mutate(baserate_hp = baserate_hp, devices = devices, use_scc = use_scc)
+  config <- tests[1,] %>% dplyr::select(combination_method = method_code,
+                                        A_threshold = A,
+                                        B_threshold = B,
+                                        C_threshold = C) %>%
+    mutate(baserate_hp = baserate_hp, use_scc = use_scc, loop_exclude = loop_exclude,
+           lr_img_exclude = lr_img_exclude, lr_audio_exclude = lr_audio_exclude,
+           devices_exclude = devices_exclude) %>% as.list()
+  config$devices <- devices
   attr(config, "class") <- c(attr(config, "class"), "HALT_config")
   return(config)
 }
@@ -73,67 +84,105 @@ auto_config <- function(baserate_hp = 211/1194,
 #'
 #' @export
 #'
-show_config <- function(config = auto_config()) {
+show_config <- function(config = HALT::auto_config()) {
+  #browser()
   stopifnot(is.list(config),
-            intersect(c("method", "A", "B", "C", "baserate_hp", "devices"), names(config)) == c("method", "A", "B", "C", "baserate_hp", "devices"),
-            config$method %in% 1:18,
+            intersect(c("combination_method", "A_threshold", "B_threshold", "C_threshold", "baserate_hp", "devices"),
+                      names(config)) == c("combination_method", "A_threshold", "B_threshold", "C_threshold", "baserate_hp", "devices"),
+            config$combination_method %in% 1:18,
             config[2:4] %in% 1:6,
             config$baserate_hp > 0,
             config$baserate_hp < 1,
             config$devices %in% c("HP", "LS"))
-  if(config$devices == "HP") {
+  if("HP" %in% config$devices) {
     br <- config$baserate_hp
     devices <- "headphones"
   } else {
     br <- 1 - config$baserate_hp
     devices <- "loudspeakers"
   }
-  test_config <- as.data.frame(HALT::test_config)
-  combi <- HALT::test_config[HALT::test_config$method_code == config$method & HALT::test_config$B == config$B & HALT::test_config$A == config$A & HALT::test_config$C == config$C,]
+  #test_config <- HALT::test_config
+  combi <- HALT::test_config[HALT::test_config$method_code == config$combination_method &
+                               HALT::test_config$B == config$B_threshold &
+                               HALT::test_config$A == config$A_threshold &
+                               HALT::test_config$C == config$C_threshold,]
+  #browser()
   combi$HP_PV <- config$baserate_hp * combi$true_hp_rate / (config$baserate_hp * combi$true_hp_rate + (1 - config$baserate_hp) * combi$false_hp_rate)
   combi$LS_PV <- (1 - config$baserate_hp) * combi$true_ls_rate / ((1 - config$baserate_hp) * combi$true_ls_rate + config$baserate_hp * combi$false_ls_rate)
   combi$Utility <- config$baserate_hp * combi$true_hp_rate + (1 - config$baserate_hp) * combi$true_ls_rate
-  names(combi) <- c(names(HALT::test_config[1:5]),
+  names(combi) <- c("Method",
+                    "Method Code",
+                    "Test A Treshold",
+                    "Test B Treshold",
+                    "Test C Treshold",
                     "True HP Rate",
                     "True LS Rate",
                     "False LS Rate",
                     "False HP Rate",
+                    "Logical Expression",
                     "HP Predictive Value",
                     "LS Predictive Value",
                     "Utility max % correct")
-  row.names(combi) <- c("")
+  #row.names(combi) <- c("")
+
   cat(sprintf("If the desired devices are %s with a prevalence of %s, the method '%s' (code %i) with thresholds %i, %i, and %i for test A, B, and C has the following properties",
               devices,
               round(br, digits = 4),
-              combi$method[1],
-              combi$method_code[1],
-              combi$A[1],
-              combi$B[1],
-              combi$C[1]),
+              combi$Method[1],
+              combi$`Method Code`[1],
+              combi$`Test A Treshold`[1],
+              combi$`Test B Treshold`[1],
+              combi$`Test C Treshold`[1]),
       "\n\n")
-  print(combi)
+  tmp <- combi[, 6:13]  %>% t()
+  print(data.frame(Value = tmp))
   #stats::printCoefmat(subset(combi, select = -c(1:5)))
 }
 #' Create a configuration object for the HALT module
 #'
 #' This function creates a configuration list for the psychTestR HALT function.
 #'
-#' @param method Number (1 to 18) corresponding to the test method.
-#' @param A Threshold for Test A (1 to 6).
-#' @param B Threshold for Test B (1 to 6).
-#' @param C Threshold for Test C (1 to 6).
+#' @param combination_method Number (1 to 18) corresponding to the test method.
+#' @param A_threshold (scalar integer) Threshold for Test A (1 to 6).
+#' @param B_threshold (scalar integer) Threshold for Test B (1 to 6).
+#' @param C_threshold (scalar integer) Threshold for Test C (1 to 6).
 #' @inheritParams auto_config
 #' @references
 #' \insertRef{HALTpaper}{HALT}
 #'
 #' @export
-make_config <- function(method, A, B, C, baserate_hp, devices, use_scc = F) {
-  stopifnot(method %in% 1:18,
-            c(A,B,C) %in% 1:6,
+make_config <- function(combination_method,
+                        A_threshold,
+                        B_threshold,
+                        C_threshold,
+                        baserate_hp, devices,
+                        use_scc = F,
+                        loop_exclude = 5L,
+                        lr_img_exclude = TRUE,
+                        lr_audio_exclude = TRUE,
+                        devices_exclude = TRUE) {
+  stopifnot(combination_method %in% 1:18,
+            all(c(A_threshold, B_threshold, C_threshold) %in% 1:6),
             baserate_hp < 1,
             baserate_hp > 0,
+            loop_exclude > 0,
             all(devices %in% c("HP","LS")))
-  config <- tibble("method" = method, "A" = A, "B" = B, "C" = C, "baserate_hp" = baserate_hp, "devices" = devices, use_scc = use_scc)
+  if(length(devices) > 1){
+    use_scc <- FALSE
+    device_exclude <- FALSE
+  }
+
+  config <- tibble("combination_method" = combination_method,
+                   "A_threshold" = A_threshold,
+                   "B_threshold" = B_threshold,
+                   "C_threshold" = C_threshold,
+                   "baserate_hp" = baserate_hp,
+                   use_scc = use_scc,
+                   loop_exclude = loop_exclude,
+                   lr_img_exclude = lr_img_exclude,
+                   lr_audio_exclude = lr_audio_exclude,
+                   devices_exclude = devices_exclude) %>% as.list()
+  config$devices <- devices
   attr(config, "class") <- c(attr(config, "class"), "HALT_config")
 
   return(config)

@@ -11,14 +11,12 @@ library(psychTestR)
 #' For a standalone implementation of the HALT,
 #' consider using \code{\link{HALT_standalone}()}.
 #' @param label (Character scalar) Label to give the HALT results in the output file.
-#' @param max_count (Integer scalar) Maximum number to show page 2 and 3 before bailing out (defaults to  3).
 #' @param config (object of class HALT_config) Use function auto_config() or make_config() to generate this.
 #' See also the documentation there for further explanations.
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
 #' @param dict The psychTestR dictionary used for internationalisation.
 #' @export
 HALT <- function(label = "HALT",
-                 max_count = 3,
                  config = HALT::auto_config(),
                  audio_dir = "https://media.gold-msi.org/test_materials/HLT",
                  dict = HALT::HALT_dict) {
@@ -29,20 +27,24 @@ HALT <- function(label = "HALT",
 
   psychTestR::join(
     psychTestR::begin_module(label),
-    main_test(label = label, max_count = max_count, audio_dir = audio_dir, config, dict = dict),
+    main_test(label = label, audio_dir = audio_dir, config, dict = dict),
     psychTestR::elt_save_results_to_disk(complete = TRUE),
     psychTestR::end_module())
 }
 
-
-
 HALT_stop_page <- function(dict = HALT::HALT_dict){
-  psychTestR::new_timeline(
-    psychTestR::final_page(
-      body = shiny::div(
-        shiny::h4(psychTestR::i18n("STOP_HEAD"), style = "margin-left:25%;display:block;text-align:left"),
-        shiny::div(psychTestR::i18n("STOP_TEXT"),
-                   style = "margin-left:25%;margin-right:25%;display:block;text-align:left")
-      )
-    ), dict = dict)
+  psychTestR::join(
+    psychTestR::code_block(function(state, ...){
+      psychTestR::elt_save_results_to_disk(complete = TRUE)
+    }
+    ),
+    psychTestR::new_timeline(
+      psychTestR::final_page(
+        body = shiny::div(
+          shiny::h4(psychTestR::i18n("STOP_HEAD"), style = "margin-left:25%;display:block;text-align:left"),
+          shiny::div(psychTestR::i18n("STOP_TEXT"),
+                     style = "margin-left:25%;margin-right:25%;display:block;text-align:left")
+        )
+      ), dict = dict)
+  )
 }

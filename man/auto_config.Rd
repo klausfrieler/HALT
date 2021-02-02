@@ -25,6 +25,8 @@ from Wycisk et al.(2020).}
 
 \item{use_scc}{(boolean, default = F) Flag whether "Splice, Convice. Compare" page shall be shown.}
 
+\item{loop_exclude}{(integer, default = 5) Number of loops for item po2.}
+
 \item{lr_img_exclude}{(boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusiogn.}
 
 \item{lr_audio_exclude}{(boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusiogn.}

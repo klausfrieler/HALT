@@ -9,7 +9,6 @@
 #' This can be used for data collection, either in the laboratory or online.
 #' @param title (Scalar character) Title to display during testing. If \code{NULL}, \code{TESTNAME} from the dictionaly is used.
 #' @param with_id (Logical character) Should an id page be included at the beginning.
-#' @param max_count (Integer scalar) Maximum number to show page 2 and 3 before bailing out (defaults to  3).
 #' @param config (object of class HALT_config) Use function auto_config() or make_config() to generate this.
 #' See also the documentation there for further explanations.
 #' @param admin_password (Scalar character) Password for accessing the admin panel.
@@ -18,8 +17,7 @@
 #' at the bottom of the screen so that online participants can ask for help.
 #' @param languages (Character vector)
 #' Determines the languages available to participants.
-#' Possible languages include English (\code{"en"}),
-#' German (\code{"de"}).
+#' Possible languages include English (\code{"en"}) and German (\code{"de"}).
 #' The first language is selected by default
 #' @param dict The psychTestR dictionary used for internationalisation.
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
@@ -29,7 +27,6 @@
 #' @export
 HALT_standalone  <- function(title = NULL,
                             with_id = FALSE,
-                            max_count = 3,
                             config = HALT::auto_config(),
                             admin_password = "HALTadmin",
                             researcher_email = "yves.wycisk@hmtm-hannover.de",
@@ -46,7 +43,6 @@ HALT_standalone  <- function(title = NULL,
                              validate = validate_id),
         dict = dict),
     HALT::HALT(label = "HALT",
-               max_count = max_count,
                audio_dir = audio_dir,
                config = config,
                dict = dict,

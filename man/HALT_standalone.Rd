@@ -44,8 +44,6 @@ The first language is selected by default}
 which means ID should consist only of  alphanumeric characters.}
 
 \item{...}{Further arguments to be passed to \code{\link{HALT}()}.}
-
-\item{max_count}{(Integer scalar) Maximum number to show page 2 and 3 before bailing out (defaults to  3).}
 }
 \description{
 This function launches a standalone testing session for the HALT

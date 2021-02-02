@@ -5,6 +5,7 @@
 #' @param num_items (Integer scalar) Number of items in the RAT test.
 #' @param feedback (Function) Defines the feedback to give the participant
 #' at the end of the test. Defaults to a graph-based feedback page.
+#' @param config (HALT_config object) A HALT_config object, generate with HATL::make_config() or auto_config() (default).
 #' @param admin_password (Scalar character) Password for accessing the admin panel.
 #' Defaults to \code{"demo"}.
 #' @param researcher_email (Scalar character)

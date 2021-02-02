@@ -27,3 +27,5 @@ NULL
 
 #' @importFrom methods "is"
 NULL
+
+#' @importFrom Rdpack "reprompt"

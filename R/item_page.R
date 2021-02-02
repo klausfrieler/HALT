@@ -144,14 +144,19 @@ audio_text_page <- function(page_no,
   label <- sprintf("po%d%s", page_no, sub_id)
   #messagef("Page no: %d, sub id = %s, correct: %s", page_no, sub_id, correct_answer)
   get_answer <- function(input, state, ...) {
-    raw_answer <- as.numeric(gsub("answer", "", input$text_input))
+    raw_answer <- suppressWarnings(as.numeric(gsub("answer", "", input$text_input)))
+    if(is.na(raw_answer)){
+      raw_answer <- -1
+    }
     answer <- translate_answer(raw_answer, correct_answer, page_no, sub_id)
     psychTestR::set_local(key = substr(label, 1, 3), value = answer, state = state)
     counter <- as.numeric(psychTestR::get_local(key = sprintf("%s_counter", substr(label, 1, 3)), state = state))
+    #browser()
+    correct <- as.character(raw_answer) == correct_answer
     format_answer(HALT_answer_format,
                   raw_answer = as.character(raw_answer),
                   answer = answer,
-                  correct = stringr::str_detect(answer, "correct"))
+                  correct = correct)
 
   }
   validate <- function(answer, ...){
@@ -200,7 +205,7 @@ local_audio_NAFC_page <- function (label, prompt, choices, url, labels = NULL, t
   psychTestR::NAFC_page(label = label, prompt = prompt2, choices = choices,
                         labels = labels, save_answer = save_answer, on_complete = on_complete,
                         arrange_vertically = arrange_choices_vertically, hide_response_ui = wait,
-                        response_ui_id = "response_ui", admin_ui = admin_ui)
+                        response_ui_id = "response_ui", admin_ui = admin_ui, button_style = "width:300px;white-space: normal;")
 }
 
 HALT_audio_NAFC_page <- function(page_no,
@@ -235,6 +240,10 @@ HALT_audio_NAFC_page <- function(page_no,
     num_correct <- psychTestR::get_local(key =  sprintf("%s_num_correct", label_short), state = state)
     psychTestR::set_local(key = sprintf("%s_num_correct", label_short),
                           value = as.integer(num_correct) + correct, state = state)
+    #psychTestR::save_result(place = state,
+    #                        label = sprintf("%s_num_correct", label_short),
+    #                        value = as.integer(num_correct) + correct)
+
     #messagef("Num_correct now %d for %d", as.integer(num_correct) + correct, page_no)
   }
   choice_seq <- 1:4L
@@ -304,8 +313,14 @@ HALT_base_page <- function(page_no, sub_id, num_pages, audio_dir, save_answer = 
                   save_answer = save_answer)
 }
 
-test_answer <- function(page_no, value, invert = F){
+test_answer <- function(page_no, config, value, invert = F){
   function(state, ...){
+    if(page_no == 4L && !config$lr_img_exclude){
+      return(FALSE)
+    }
+    if(page_no == 5L && !config$lr_audio_exclude){
+      return(FALSE)
+    }
     answer <- psychTestR::get_local(sprintf("po%d", page_no), state)
     ret <- !is.null(answer) && answer == value
     if(invert){
@@ -315,7 +330,7 @@ test_answer <- function(page_no, value, invert = F){
   }
 }
 
-test_counter <- function(page_no, max_count = 4){
+test_counter <- function(page_no, max_count = 5){
   function(state, ...){
     counter <- psychTestR::get_local(sprintf("po%d_counter", page_no), state)
     if(is.null(counter)){
@@ -357,10 +372,10 @@ left_right_page <- function(audio_dir, right_first, num_pages){
   }
   img_url <- gsub("mp3", "png", get_audio_url(audio_dir = audio_dir, page_no = 4L, sub_id = ""))
   on_complete <- function(answer, state, ...){
-    counter <- psychTestR::get_local(key = "po4_counter", state = state)
 
     psychTestR::set_local("po4", answer, state)
-    answer <- format_answer(HALT_answer_format, raw_answer = as.character(answer),
+    answer <- format_answer(HALT_answer_format,
+                            raw_answer = as.character(answer),
                             answer  = answer,
                             correct = answer == "left")
     psychTestR::save_result(place = state, label = "po4", value = answer)
@@ -377,21 +392,36 @@ left_right_page <- function(audio_dir, right_first, num_pages){
                                      psychTestR::i18n("THLT_0004_CHOICES2"))[perm],
                           on_complete = on_complete,
                           arrange_vertically =  TRUE,
-                          save_answer = FALSE),
+                          save_answer = TRUE),
   dict = HALT::HALT_dict)
 }
 
-device_page <- function(num_pages){
+device_page <- function(num_pages, config){
+
   on_complete <- function(answer, state, ...){
-    psychTestR::set_local("uses_headphones", answer == "1", state)
-    answer <- format_answer(HALT_answer_format, raw_answer = as.character(answer),
-                            answer  = answer,
-                            correct = answer == "1")
-    psychTestR::save_result(place = state, label = "uses_headphones", value = answer)
+    device_names <- c("headphones",
+                      "laptop_speakers",
+                      "loudspeakers",
+                      "smartphone_speakers",
+                      "tablet_speakers",
+                      "monitor_speakers")
+    correct <- FALSE
+    if("HP"  %in% config$devices){
+      if(answer == "1") correct <- TRUE
+    }
+    if("LS"  %in% config$devices){
+      if(answer != "1") correct <- TRUE
+    }
+    psychTestR::set_local("device_selfreport", correct, state)
+    answer <- format_answer(HALT_answer_format,
+                            raw_answer = answer,
+                            answer  = device_names[as.integer(answer)],
+                            correct = correct)
+    psychTestR::save_result(place = state, label = "device_selfreport", value = answer)
   }
 
   psychTestR::new_timeline(
-    psychTestR::NAFC_page("device",
+    psychTestR::NAFC_page("device_screening",
                           prompt = shiny::div(get_page_counter("device", num_pages),
                                               shiny::div(psychTestR::i18n("DEVICE_PROMPT"),
                                                          style = HALT_standard_style)),
@@ -404,10 +434,10 @@ device_page <- function(num_pages){
     dict = HALT::HALT_dict)
 }
 
-scc_page <- function(dict = HALT::HALT_dict){
-
+scc_page <- function(dict = HALT::HALT_dict, config){
+  SCC_PROMPT <- sprintf("SCC_PROMPT_%s", config$devices[1])
   psychTestR::new_timeline(
-    psychTestR::one_button_page(body = shiny::div(psychTestR::i18n("SCC_PROMPT"),
+    psychTestR::one_button_page(body = shiny::div(psychTestR::i18n(SCC_PROMPT),
                                                   style = HALT_standard_style),
                                 button_text = psychTestR::i18n("CONTINUE")),
     dict = dict
@@ -430,7 +460,7 @@ page_po1 <- function(audio_dir, num_pages){
     dict = HALT::HALT_dict)
 }
 
-page_po4 <- function(audio_dir, max_count = 3L, num_pages){
+page_po4_old <- function(audio_dir, config, num_pages){
   psychTestR::join(
     psychTestR::code_block(
       function(state, ...){
@@ -439,7 +469,7 @@ page_po4 <- function(audio_dir, max_count = 3L, num_pages){
       }
     ),
     psychTestR::while_loop(
-      test = test_force_loop(page_no = 4L, max_count, correct_answer = "left"),
+      test = test_force_loop(page_no = 4L, max_count = config$loop_exclude, correct_answer = "left"),
       logic = psychTestR::join(
         psychTestR::code_block(function(state,...){
           counter <- psychTestR::get_local(key = "po4_counter", state = state)
@@ -449,12 +479,32 @@ page_po4 <- function(audio_dir, max_count = 3L, num_pages){
                                 logic = left_right_page(audio_dir, right_first = F, num_pages)),
         psychTestR::conditional(test = select_left_right("right"),
                                 logic = left_right_page(audio_dir, right_first = T, num_pages)),
-        psychTestR::conditional(test = test_answer(page_no = 4L, "right"),
-                                logic = warning_page("warning_p04", "WARNING_INCORRECT"))
-  )))
+        #psychTestR::conditional(test = test_answer(page_no = 4L, config, "right"),
+        #                        logic = warning_page("warning_p04", "WARNING_INCORRECT"))
+        psychTestR::conditional(test = test_answer(page_no = 4L, config, "right"),
+                                logic = HALT_stop_page())
+      )))
 }
 
-page_force_correct <- function(page_no, num_pages, max_count = 3L, audio_dir){
+page_po4 <- function(config, audio_dir, num_pages){
+  psychTestR::join(
+      psychTestR::conditional(test = select_left_right("left"),
+                              logic = left_right_page(audio_dir, right_first = F, num_pages)),
+      psychTestR::conditional(test = select_left_right("right"),
+                              logic = left_right_page(audio_dir, right_first = T, num_pages)),
+      psychTestR::conditional(test = test_answer(page_no = 4L, config, "right"),
+                              logic = HALT_stop_page()))
+}
+
+
+page_po5 <- function(config, audio_dir, num_pages){
+  psychTestR::join(
+    page_calibrate(page_no = 5L, num_pages, audio_dir = audio_dir, save_answer = T),
+    psychTestR::conditional(test = test_answer(page_no = 5L, config, "stereo channels correct", invert = T),
+                            logic = HALT_stop_page()))
+}
+
+page_force_correct <- function(page_no, num_pages, config, audio_dir){
   warning_label <- sprintf("warning_po%d", page_no)
   psychTestR::join(
     psychTestR::code_block(
@@ -464,11 +514,11 @@ page_force_correct <- function(page_no, num_pages, max_count = 3L, audio_dir){
       }
     ),
     psychTestR::while_loop(
-      test = test_force_loop(page_no, max_count),
+      test = test_force_loop(page_no, config$loop_exclude),
       logic = psychTestR::join(
-        psychTestR::conditional(test = test_answer(page_no, "too quiet"),
+        psychTestR::conditional(test = test_answer(page_no, config, "too quiet"),
                                 logic = warning_page(warning_label, "WARNING_TOO_QUIET")),
-        psychTestR::conditional(test = test_answer(page_no, "imprecise"),
+        psychTestR::conditional(test = test_answer(page_no, config, "imprecise"),
                                 logic = warning_page(warning_label, "WARNING_IMPRECISE")),
         page_calibrate(page_no = page_no, num_pages, audio_dir = audio_dir, save_answer = T),
         psychTestR::code_block(function(state, ...){
@@ -494,8 +544,6 @@ page_calibrate <- function(page_no, num_pages, audio_dir, save_answer = T){
       }))
     , dict = HALT::HALT_dict)
 }
-
-
 
 page_ABC_section <- function(page_no, num_pages, audio_dir){
   psychTestR::new_timeline(
