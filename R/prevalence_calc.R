@@ -166,7 +166,7 @@ post_hoc_est <- function(combination_method, A, B, C, baserate_hp, devices, samp
   } else {
     min_number <- qbinom(p = min_prob, size = samplesize, prob = procedure$PV[1], lower.tail = FALSE)
   }
-  cat(sprintf("In a sample of %i participants the event that at least %i used the desired device (%s) has a probability of at least %f when the prevalence for headphones is %f and the test procedure '%s' with thresholds %i, %i, and %i for tests A, B, and C was used.",
+  cat(sprintf("In a sample of %i participants the event that at least %i used the desired device (%s) has a probability of at least %.2f when the prevalence for headphones is %.2f and the test procedure '%s' with thresholds %i, %i, and %i for tests A, B, and C was used.",
               as.integer(samplesize), as.integer(min_number), devices, min_prob, baserate_hp, HALT::test_config$method[test_config$method_code == combination_method][1], as.integer(A), as.integer(B), as.integer(C)))
 }
 #' A priori estimations
@@ -239,12 +239,15 @@ a_priori_est <- function(baserate_hp = 211/1194,
 
   tests$min_quality_percent <- 100*min_number/tests$samplesize
 
-  tests <- tests %>% dplyr::select(method, method_code, A, B, C, true_hp_rate, true_ls_rate, hp_pv, ls_pv, utility, samplesize, min_quality_percent, expectation_total_participants) %>% filter(samplesize <= min(samplesize) + tolerance) %>% dplyr::arrange(samplesize)
+  tests <- tests %>% select(-false_ls_rate, -false_hp_rate, -logic_expr) %>%
+    filter(samplesize <= min(samplesize) + tolerance) %>%
+    arrange(samplesize)
   # explanation text
-  cat(sprintf(
-    "When the prevelance for headphones is %f and the test procedure %s (code %i) with thresholds %i, %i, and %i for tests A, B, and C is used you need a sample of %i participants classified as %s to have a probability of at least %f that %i participants actually used %s. The 'quality' (precentage of correct devices) of such a sample would then be at least %f percent.\n",
+  explanation <-
+    sprintf(
+    "When the prevelance for headphones is %.2f and the test procedure %s (code %i) with thresholds %i, %i, and %i for tests A, B, and C is used you need a sample of %i participants classified as %s to have a probability of at least %.2f that %i participants actually used %s. The 'quality' (precentage of correct devices) of such a sample would then be at least %.1f percent.\n",
     baserate_hp, tests$method[1], tests$method_code[1], as.integer(tests$A[1]), as.integer(tests$B[1]), as.integer(tests$C[1]), as.integer(tests$samplesize[1]), devices, min_prob, as.integer(min_number), devices, tests$min_quality_percent[1])
-  )
+  attr(tests, "explanation") <- explanation
   # actual output
-  tests %>% t()
+  tests
 }
