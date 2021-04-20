@@ -5,13 +5,12 @@
 #'
 #' @param baserate_hp Sets the (estimated) prevalence of headphones in the
 #' target population as a number between 0 and 1. Defaults to the unbiased
-#' prevalence B of 0.1767.
-#' from Wycisk et al.(2020).
+#' prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.
 #'
 #' @param devices Sets the desired playback device. Possible settings are
 #' \code{"HP"} for headphones or \code{"LS"} for loudspeakers.
 #'
-#' @param use_scc (boolean, default = F) Flag whether "Splice, Convice. Compare" page shall be shown.
+#' @param use_scc (boolean, default = F) Flag whether "Split, Convince, Compare" page shall be shown.
 #' @param loop_exclude (integer, default = 5) Number of loops for item po2.
 #' @param lr_img_exclude (boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusiogn.
 #' @param lr_audio_exclude (boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusiogn.
@@ -34,7 +33,13 @@ auto_config <- function(baserate_hp = 211/1194,
             length(baserate_hp) == 1,
             baserate_hp < 1,
             baserate_hp > 0,
-            loop_exclude > 0)
+            #as.integer(loop_exclude) == as.double(integer),
+            loop_exclude > 0
+            )
+  if(length(devices) > 1){
+    use_scc <- FALSE
+    devices_exclude <- FALSE
+  }
 
   tests <- HALT::test_config  %>% filter(true_ls_rate > 0.5, true_hp_rate > 0.5)
 
@@ -48,12 +53,12 @@ auto_config <- function(baserate_hp = 211/1194,
 
   if("HP" %in% devices) {
     tests <- tests %>%
-      filter(tests$hp_pv == max(tests$hp_pv)) %>%
-      filter(tests$ls_pv == max(tests$ls_pv))
+      filter(hp_pv == max(hp_pv)) %>%
+      filter(ls_pv == max(ls_pv))
   } else {
     tests <- tests %>%
-      filter(tests$ls_pv == max(tests$ls_pv)) %>%
-      filter(tests$hp_pv == max(tests$hp_pv))
+      filter(ls_pv == max(ls_pv)) %>%
+      filter(hp_pv == max(hp_pv))
   }
   if(length(devices) > 1){
     use_scc <- FALSE
@@ -79,8 +84,8 @@ auto_config <- function(baserate_hp = 211/1194,
 #' Predictive Value, the Loudspeakers Predictive Value and the Utility for
 #' maximizing percent correct.
 #'
-#' @param config Output from \link{HALT}{\code{auto_config}} or an accordingly named
-#' list.
+#' @param config Output from \code{\link[=auto_config]{auto_config()}} or an
+#' accordingly named list.
 #'
 #' @export
 #'
@@ -90,10 +95,19 @@ show_config <- function(config = HALT::auto_config()) {
             intersect(c("combination_method", "A_threshold", "B_threshold", "C_threshold", "baserate_hp", "devices"),
                       names(config)) == c("combination_method", "A_threshold", "B_threshold", "C_threshold", "baserate_hp", "devices"),
             config$combination_method %in% 1:18,
-            config[2:4] %in% 1:6,
+            config[2:4] %in% 0:6,
             config$baserate_hp > 0,
             config$baserate_hp < 1,
-            config$devices %in% c("HP", "LS"))
+            all(config$devices %in% c("HP", "LS")))
+  if(config$combination_method %in% c(1,4,5,8:18) && config$A_threshold == 0) {stop(sprintf("combination_method = %i needs A_threshold > 0!", config$combination_method))}
+  if(config$combination_method %in% c(2,4,5,6,7, 10:18) && config$B_threshold == 0) {stop(sprintf("combination_method = %i needs B_threshold > 0!", config$combination_method))}
+  if(config$combination_method %in% c(3,6,7,8:18) && config$C_threshold == 0) {stop(sprintf("combination_method = %i needs C_threshold > 0!", config$combination_method))}
+
+  # set unused test's thresholds to 0
+  if(config$combination_method %in% c(2,3,6,7)){config$A_threshold <- 0}
+  if(config$combination_method %in% c(1,3,8,9)){config$B_threshold <- 0}
+  if(config$combination_method %in% c(1,2,4,5)){config$C_threshold <- 0}
+
   if("HP" %in% config$devices) {
     br <- config$baserate_hp
     devices <- "headphones"
@@ -162,15 +176,25 @@ make_config <- function(combination_method,
                         lr_audio_exclude = TRUE,
                         devices_exclude = TRUE) {
   stopifnot(combination_method %in% 1:18,
-            all(c(A_threshold, B_threshold, C_threshold) %in% 1:6),
+            all(c(A_threshold, B_threshold, C_threshold) %in% 0:6),
             baserate_hp < 1,
             baserate_hp > 0,
             loop_exclude > 0,
-            all(devices %in% c("HP","LS")))
+            #as.integer(loop_exclude) == as.double(integer),
+            #is.logical(c(lr_img_exclude, lr_audio_exclude, devices_exclude)),
+            all(devices %in% c("HP","LS"))
+            )
+  if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0){stop(sprintf("combination_method = %i needs A_threshold > 0!", combination_method))}
+  if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){stop(sprintf("combination_method = %i needs B_threshold > 0!", combination_method))}
+  if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){stop(sprintf("combination_method = %i needs C_threshold > 0!", combination_method))}
   if(length(devices) > 1){
     use_scc <- FALSE
     device_exclude <- FALSE
   }
+  # set unused test's thresholds to 0
+  if(combination_method %in% c(2,3,6,7)){A_threshold <- 0}
+  if(combination_method %in% c(1,3,8,9)){B_threshold <- 0}
+  if(combination_method %in% c(1,2,4,5)){C_threshold <- 0}
 
   config <- tibble("combination_method" = combination_method,
                    "A_threshold" = A_threshold,

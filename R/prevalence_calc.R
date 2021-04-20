@@ -5,7 +5,7 @@
 #'
 #' @param baserate_hp Sets the (estimated) prevalence of headphones in the
 #' target population as a number between 0 and 1. Defaults to the unbiased
-#' prevalence B of 0.1767 from \insertCite{HALTPaper;textual}{HALT}.
+#' prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.
 #'
 #' @references
 #' \insertRef{HALTpaper}{HALT}
@@ -110,7 +110,8 @@ max_properties <- function(baserate_hp = 211/1194) {
 #'
 #' @inheritParams make_config
 #'
-#' @param samplesize
+#' @param samplesize number of participants classified as users of the target
+#' device
 #'
 #' @param min_number minimum number of participants \code{k} who passed the
 #' test procedure and used the correct device
@@ -126,35 +127,38 @@ max_properties <- function(baserate_hp = 211/1194) {
 #' \insertRef{HALTpaper}{HALT}
 #'
 #' @export
-post_hoc_est <- function(combination_method, A, B, C, baserate_hp, devices, samplesize, min_number = NULL, min_prob = NULL) {
+post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_threshold, baserate_hp, devices, samplesize, min_number = NULL, min_prob = NULL) {
   stopifnot(combination_method %in% 1:18,
-            all(c(A,B,C) %in% 1:6),
+            all(c(A_threshold,B_threshold,C_threshold) %in% 0:6),
             baserate_hp < 1,
             baserate_hp > 0,
             devices %in% c("HP","LS"),
-            is.numeric(samplesize),
+            samplesize > 0,
             as.integer(samplesize) == as.double(samplesize),
             ((min_number <= samplesize & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
   )
+  if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0){stop(sprintf("combination_method = %i needs A_threshold > 0!", combination_method))}
+  if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){stop(sprintf("combination_method = %i needs B_threshold > 0!", combination_method))}
+  if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){stop(sprintf("combination_method = %i needs C_threshold > 0!", combination_method))}
 
-  config <- HALT::make_config(combination_method = combination_method, A = A, B = B, C = C, baserate_hp = baserate_hp, devices = devices, use_scc = F)
+  config <- HALT::make_config(combination_method = combination_method, A_threshold = A_threshold, B_threshold = B_threshold, C_threshold = C_threshold, baserate_hp = baserate_hp, devices = devices, use_scc = F, devices_exclude = T)
   if (combination_method < 10) {
     if (combination_method %in% c(2,3,6,7)) {
-      A <- 0
-      config$A <- 0
+      A_threshold <- 0
+      config$A_threshold <- 0
     }
     if (combination_method %in% c(1,3,8,9)) {
-      B <- 0
-      config$B <- 0
+      B_threshold <- 0
+      config$B_threshold <- 0
     }
     if (combination_method %in% c(1,2,4,5)) {
-      C <- 0
-      config$C <- 0
+      C_threshold <- 0
+      config$C_threshold <- 0
     }
   }
 
-  procedure <- HALT::test_config %>% filter(method_code == config$combination_method, A == config$A, B == config$B, C == config$C)
-#    test_config[test_config$method_code == combination_method & test_config$B == B & test_config$A == A & test_config$C == C,]
+  procedure <- HALT::test_config %>% filter(method_code == config$combination_method, A == config$A_threshold, B == config$B_threshold, C == config$C_threshold)
+#    test_config[test_config$method_code == combination_method & test_config$B == B_threshold & test_config$A == A_threshold & test_config$C == C_threshold,]
 
   if(devices == "HP") {
     procedure$PV <- procedure$true_hp_rate * baserate_hp / (procedure$true_hp_rate * baserate_hp + (1 - baserate_hp) * procedure$false_hp_rate)
@@ -166,17 +170,17 @@ post_hoc_est <- function(combination_method, A, B, C, baserate_hp, devices, samp
   } else {
     min_number <- qbinom(p = min_prob, size = samplesize, prob = procedure$PV[1], lower.tail = FALSE)
   }
-  cat(sprintf("In a sample of %i participants the event that at least %i used the desired device (%s) has a probability of at least %.2f when the prevalence for headphones is %.2f and the test procedure '%s' with thresholds %i, %i, and %i for tests A, B, and C was used.",
-              as.integer(samplesize), as.integer(min_number), devices, min_prob, baserate_hp, HALT::test_config$method[test_config$method_code == combination_method][1], as.integer(A), as.integer(B), as.integer(C)))
+  cat(sprintf("In a sample of %i participants the event that at least %i used the desired device (%s) has a probability of at least %.4f when the prevalence for headphones is %.4f and the test procedure '%s' with thresholds %i, %i, and %i for tests A, B, and C was used.",
+              as.integer(samplesize), as.integer(min_number), devices, min_prob, baserate_hp, HALT::test_config$method[test_config$method_code == combination_method][1], as.integer(A_threshold), as.integer(B_threshold), as.integer(C_threshold)))
 }
 #' A priori estimations
 #'
 #' This function provides estimations for the sample size required for the
 #' event that at least a minimum number of participants used the desired
 #' devices to have a specified minimum probability. By default, the function
-#' returns the test procedure that requires the smallest sample size for this
-#' event. To return test procedures with similar required sample sizes use the
-#' parameter \code{tolerance}.
+#' returns the screening procedure that requires the smallest sample size for
+#' this event. To return screening procedures with similar required sample
+#' sizes use the parameter \code{tolerance}.
 #'
 #' The function uses the Normal approximation of the Binomial distribution with
 #' continuity correction.
@@ -184,19 +188,22 @@ post_hoc_est <- function(combination_method, A, B, C, baserate_hp, devices, samp
 #' @inheritParams auto_config
 #'
 #' @param min_number minimum number of participants passing the test procedure
-#' and using the desired devices
+#' and using the target devices
 #'
 #' @param min_prob minimum probability (equal to or greater than 0.6, less than
-#' 1) for the event that at least \link{HALT}{\code{minimum_number}}
-#' participants pass the test procedure and use the desired devices.
+#' 1) for the event that at least \code{min_number} participants pass the test
+#' procedure and use the target devices.
 #'
-#' @param tolerance (non-negative integer) defaults to \code{0}. If set to a
-#' value greater than 0 the function returns the test procedures whose sample
-#' sizes exceed the minimum sample size by at most this value.
+#' @param tolerance (non-negative integer) defaults to \code{0}. A value of 0
+#' searches for the screening procedures with the minimum sample size.
+#' If set to a value > 0 the function returns the screening procedures whose
+#' sample sizes exceed the minimum sample size by at most this value.
 #'
 #' @return probabilistic statement (explanation text) and a transposed data
 #' frame with the characteristics of the test procedure(s).
 #'
+#' @references
+#' \insertRef{HALTpaper}{HALT}
 #' @export
 a_priori_est <- function(baserate_hp = 211/1194,
                          devices = "HP",
@@ -206,7 +213,7 @@ a_priori_est <- function(baserate_hp = 211/1194,
   stopifnot(baserate_hp < 1,
             baserate_hp > 0,
             devices %in% c("HP","LS"),
-            is.numeric(min_number),
+            min_number > 0,
             as.integer(min_number) == as.double(min_number),
             min_prob >= 0.6,
             min_prob < 1,
@@ -239,13 +246,13 @@ a_priori_est <- function(baserate_hp = 211/1194,
 
   tests$min_quality_percent <- 100*min_number/tests$samplesize
 
-  tests <- tests %>% select(-false_ls_rate, -false_hp_rate, -logic_expr) %>%
+  tests <- tests %>% dplyr::select(-false_ls_rate, -false_hp_rate, -logic_expr) %>%
     filter(samplesize <= min(samplesize) + tolerance) %>%
-    arrange(samplesize)
+    dplyr::arrange(samplesize)
   # explanation text
   explanation <-
     sprintf(
-    "When the prevelance for headphones is %.2f and the test procedure %s (code %i) with thresholds %i, %i, and %i for tests A, B, and C is used you need a sample of %i participants classified as %s to have a probability of at least %.2f that %i participants actually used %s. The 'quality' (precentage of correct devices) of such a sample would then be at least %.1f percent.\n",
+    "When the prevelance for headphones in your target sample is assumed to be %.4f and the screening method '%s' (code %i) with thresholds of %i, %i, and %i correct responses for tests A, B, and C is used a sample of %i participants classified as %s users is required to have a probability of at least %.2f that %i participants actually used %s. The percentage of correct identified target playback devices ('quality') of such a sample would then be at least %.1f percent.",
     baserate_hp, tests$method[1], tests$method_code[1], as.integer(tests$A[1]), as.integer(tests$B[1]), as.integer(tests$C[1]), as.integer(tests$samplesize[1]), devices, min_prob, as.integer(min_number), devices, tests$min_quality_percent[1])
   attr(tests, "explanation") <- explanation
   # actual output
