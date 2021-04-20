@@ -11,7 +11,8 @@ library(psychTestR)
 #' For a standalone implementation of the HALT,
 #' consider using \code{\link{HALT_standalone}()}.
 #' @param label (Character scalar) Label to give the HALT results in the output file.
-#' @param config (object of class HALT_config) Use function auto_config() or make_config() to generate this.
+#' @param config (object of class HALT_config or path to config file generated with HALTConfig)
+#' Use the functions auto_config() or make_config() to generate this or provide a filename of a config file generated with the HALTConfig Shiny App
 #' See also the documentation there for further explanations.
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
 #' @param dict The psychTestR dictionary used for internationalisation.
@@ -20,7 +21,7 @@ HALT <- function(label = "HALT",
                  config = HALT::auto_config(),
                  audio_dir = "https://media.gold-msi.org/test_materials/HLT",
                  dict = HALT::HALT_dict) {
-  stopifnot(is(config, "HALT_config"))
+  stopifnot(is(config, "HALT_config") || is.character(config) && file.exists(config))
   stopifnot(purrr::is_scalar_character(label))
   stopifnot(purrr::is_scalar_character(audio_dir))
   audio_dir <- gsub("/$", "", audio_dir)

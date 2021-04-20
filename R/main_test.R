@@ -75,6 +75,13 @@ count_page <- function(){
 
 main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
   #parseAB <-  parse_testAB_strategy(test_AB_strategy)
+  if(is.character(config)){
+    if(file.exists(config)){
+      config <- read.csv(config, sep = ";")
+      stopifnot(length(config) == 11 && nrow(config) == 1)
+      names(config) <- names(auto_config())
+    }
+  }
   num_ABC_items <- 18
   num_pages <- 9 + num_ABC_items
   p04_max_count <- ifelse(config$lr_img_exclude, 0, 1)

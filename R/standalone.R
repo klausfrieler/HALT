@@ -9,7 +9,8 @@
 #' This can be used for data collection, either in the laboratory or online.
 #' @param title (Scalar character) Title to display during testing. If \code{NULL}, \code{TESTNAME} from the dictionaly is used.
 #' @param with_id (Logical character) Should an id page be included at the beginning.
-#' @param config (object of class HALT_config) Use function auto_config() or make_config() to generate this.
+#' @param config (object of class HALT_config or path to config file generated with HALTConfig) Use functions
+#' auto_config() or make_config() to generate this or provide a filename of a config file generated with the HALTConfig Shiny App.
 #' See also the documentation there for further explanations.
 #' @param admin_password (Scalar character) Password for accessing the admin panel.
 #' @param researcher_email (Scalar character)
