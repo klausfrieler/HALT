@@ -7,8 +7,8 @@
 show_config(config = HALT::auto_config())
 }
 \arguments{
-\item{config}{Output from \link{HALT}{\code{auto_config}} or an accordingly named
-list.}
+\item{config}{Output from \code{\link[=auto_config]{auto_config()}} or an
+accordingly named list.}
 }
 \description{
 This function prints out the properties of the automatic configuration:

@@ -6,9 +6,9 @@
 \usage{
 post_hoc_est(
   combination_method,
-  A,
-  B,
-  C,
+  A_threshold,
+  B_threshold,
+  C_threshold,
   baserate_hp,
   devices,
   samplesize,
@@ -19,15 +19,21 @@ post_hoc_est(
 \arguments{
 \item{combination_method}{Number (1 to 18) corresponding to the test method.}
 
+\item{A_threshold}{(scalar integer) Threshold for Test A (1 to 6).}
+
+\item{B_threshold}{(scalar integer) Threshold for Test B (1 to 6).}
+
+\item{C_threshold}{(scalar integer) Threshold for Test C (1 to 6).}
+
 \item{baserate_hp}{Sets the (estimated) prevalence of headphones in the
 target population as a number between 0 and 1. Defaults to the unbiased
-prevalence B of 0.1767.
-from Wycisk et al.(2020).}
+prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
 
 \item{devices}{Sets the desired playback device. Possible settings are
 \code{"HP"} for headphones or \code{"LS"} for loudspeakers.}
 
-\item{samplesize}{}
+\item{samplesize}{number of participants classified as users of the target
+device}
 
 \item{min_number}{minimum number of participants \code{k} who passed the
 test procedure and used the correct device}

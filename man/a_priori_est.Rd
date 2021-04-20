@@ -15,22 +15,22 @@ a_priori_est(
 \arguments{
 \item{baserate_hp}{Sets the (estimated) prevalence of headphones in the
 target population as a number between 0 and 1. Defaults to the unbiased
-prevalence B of 0.1767.
-from Wycisk et al.(2020).}
+prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
 
 \item{devices}{Sets the desired playback device. Possible settings are
 \code{"HP"} for headphones or \code{"LS"} for loudspeakers.}
 
 \item{min_number}{minimum number of participants passing the test procedure
-and using the desired devices}
+and using the target devices}
 
 \item{min_prob}{minimum probability (equal to or greater than 0.6, less than
-1) for the event that at least \link{HALT}{\code{minimum_number}}
-participants pass the test procedure and use the desired devices.}
+1) for the event that at least \code{min_number} participants pass the test
+procedure and use the target devices.}
 
-\item{tolerance}{(non-negative integer) defaults to \code{0}. If set to a
-value greater than 0 the function returns the test procedures whose sample
-sizes exceed the minimum sample size by at most this value.}
+\item{tolerance}{(non-negative integer) defaults to \code{0}. A value of 0
+searches for the screening procedures with the minimum sample size.
+If set to a value > 0 the function returns the screening procedures whose
+sample sizes exceed the minimum sample size by at most this value.}
 }
 \value{
 probabilistic statement (explanation text) and a transposed data
@@ -40,11 +40,14 @@ frame with the characteristics of the test procedure(s).
 This function provides estimations for the sample size required for the
 event that at least a minimum number of participants used the desired
 devices to have a specified minimum probability. By default, the function
-returns the test procedure that requires the smallest sample size for this
-event. To return test procedures with similar required sample sizes use the
-parameter \code{tolerance}.
+returns the screening procedure that requires the smallest sample size for
+this event. To return screening procedures with similar required sample
+sizes use the parameter \code{tolerance}.
 }
 \details{
 The function uses the Normal approximation of the Binomial distribution with
 continuity correction.
+}
+\references{
+\insertRef{HALTpaper}{HALT}
 }
