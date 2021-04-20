@@ -1,3 +1,7 @@
+# HALT 0.9.2
+
+* Closing in on final version
+
 # HALT 0.9.0
 
 * First beta version of new spec 0.9.0

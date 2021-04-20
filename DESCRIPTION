@@ -1,7 +1,7 @@
 Package: HALT
 Type: Package
 Title: Headphone and Loudspeaker Test
-Version: 0.9.1
+Version: 0.9.2
 Author: Klaus Frieler, Yves Wycisk
 Maintainer: Klaus Frieler <kf@omniversum.de>
 Description: Implementation of a headphone and loudspeaker detection test for online experiment.
