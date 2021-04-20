@@ -22,7 +22,7 @@ test_device <- function(invert = F, config){
 
 get_device <- function(config){
   function(state,...){
-    browser()
+    #browser()
     A_correct <- psychTestR::get_local("po6_num_correct", state)
     B_correct <- psychTestR::get_local("po7_num_correct", state)
     C_correct <- psychTestR::get_local("po13_num_correct", state)
