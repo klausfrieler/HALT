@@ -1,11 +1,10 @@
 #' Demo HALT
 #'
-#' This function launches a demo for the HALT, which is wrapped around a RAT test.
+#' This function launches a demo for the HALT, which is just a wrapper to HALT_standalong with an no_screening flag.
+#' This function launches a demo for the HALT, which is just a wrapper to HALT_standalong with an no_screening flag.
 #'
-#' @param num_items (Integer scalar) Number of items in the RAT test.
-#' @param feedback (Function) Defines the feedback to give the participant
-#' at the end of the test. Defaults to a graph-based feedback page.
 #' @param config (HALT_config object) A HALT_config object, generate with HATL::make_config() or auto_config() (default).
+#' @param no_screening (Scalar booelan) Whether to use the screening part or not.
 #' @param admin_password (Scalar character) Password for accessing the admin panel.
 #' Defaults to \code{"demo"}.
 #' @param researcher_email (Scalar character)
@@ -17,31 +16,26 @@
 #' @param language The language you want to run your demo in.
 #' Possible languages include English (\code{"EN"}) and German (\code{"DE"}).
 #' The first language is selected by default
-#' @param ... Further arguments to be passed to \code{\link{RAT}()}.
 #' @export
 #'
-HALT_demo <- function(num_items = 3L,
-                     feedback = NULL,
-                     config = HALT::auto_config(use_scc = T),
-                     admin_password = "demo",
-                     researcher_email = "",
-                     dict = HALT::HALT_dict,
-                     language = "en",
-                     ...) {
+HALT_demo <- function(config = HALT::auto_config(use_scc = T),
+                      no_screening = TRUE,
+                      admin_password = "demo",
+                      researcher_email = "",
+                      dict = HALT::HALT_dict,
+                      language = "en") {
   elts <- psychTestR::join(
-    HALT::HALT(dict = dict),
-    RAT::RAT(num_items = num_items,
-             with_welcome = FALSE,
-             take_training = TRUE,
-             feedback = feedback,
-             dict = RAT::RAT_dict,
-             ...),
+    HALT::HALT(dict = dict, no_screening = no_screening),
     psychTestR::final_page(body = "")
   )
+  title = "HALT Demo"
+  if(no_screening){
+    title <- "HALT Demo Without Screening)"
 
+  }
   psychTestR::make_test(
     elts,
-    opt = psychTestR::test_options(title = "HALT Demo + RAT",
+    opt = psychTestR::test_options(title = title,
                                    admin_password = admin_password,
                                    researcher_email = researcher_email,
                                    demo = TRUE,

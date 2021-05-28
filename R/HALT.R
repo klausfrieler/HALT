@@ -1,5 +1,5 @@
-library(tidyverse)
-library(psychTestR)
+#library(tidyverse)
+#library(psychTestR)
 
 #' HALT
 #'
@@ -15,20 +15,26 @@ library(psychTestR)
 #' Use the functions auto_config() or make_config() to generate this or provide a filename of a config file generated with the HALTConfig Shiny App
 #' See also the documentation there for further explanations.
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
+#' @param no_screening (Scalar boolean). Whether to include screening parts or not.
 #' @param dict The psychTestR dictionary used for internationalisation.
 #' @export
 HALT <- function(label = "HALT",
                  config = HALT::auto_config(),
                  audio_dir = "https://media.gold-msi.org/test_materials/HLT",
+                 no_screening = FALSE,
                  dict = HALT::HALT_dict) {
   stopifnot(is(config, "HALT_config") || is.character(config) && file.exists(config))
   stopifnot(purrr::is_scalar_character(label))
   stopifnot(purrr::is_scalar_character(audio_dir))
   audio_dir <- gsub("/$", "", audio_dir)
+  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict)
+  if(no_screening){
+    main_test <- main_test_no_screening(label = label, audio_dir = audio_dir, config, dict = dict)
+  }
 
   psychTestR::join(
     psychTestR::begin_module(label),
-    main_test(label = label, audio_dir = audio_dir, config, dict = dict),
+    main_test,
     psychTestR::elt_save_results_to_disk(complete = TRUE),
     psychTestR::end_module())
 }

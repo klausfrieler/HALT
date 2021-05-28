@@ -129,3 +129,50 @@ main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
 }
 
 
+main_test_no_screening <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
+  #parseAB <-  parse_testAB_strategy(test_AB_strategy)
+  if(is.character(config)){
+    if(file.exists(config)){
+      config <- read.csv(config, sep = ";")
+      stopifnot(length(config) == 11 && nrow(config) == 1)
+      names(config) <- names(auto_config())
+    }
+  }
+  num_ABC_items <- 0
+  num_pages <- 9 + num_ABC_items
+  p04_max_count <- ifelse(config$lr_img_exclude, 0, 1)
+  max_count <- config$loop_exclude
+  elts <- psychTestR::join(
+
+    page_po1(audio_dir, num_pages, no_screening = TRUE),
+    page_force_correct(2L, num_pages, config, audio_dir, no_screening = TRUE),
+    psychTestR::conditional(
+      test = function(state, ...){
+        if(config$lr_audio_exclude  == FALSE){
+          return(FALSE)
+        }
+        counter <- psychTestR::get_local("po2_counter", state)
+        answer <- psychTestR::get_local("po2", state)
+
+        counter >= max_count && !stringr::str_detect(answer, "correct")
+      },
+      logic = HALT_stop_page(dict)),
+    #page_calibrate(3L, num_pages,  audio_dir),
+    page_po4(config, audio_dir, num_pages, no_screening = TRUE),
+    page_po5(config, audio_dir, num_pages, no_screening = TRUE),
+    device_page(num_pages, config),
+    if(config$use_scc) psychTestR::conditional(
+      test = function(state, ...){
+        has_admissable_device <- psychTestR::get_local("device_selfreport", state)
+        length(config$devices) < 2 && !has_admissable_device
+      },
+      logic = scc_page(dict, config)),
+    page_calibrate(8L, num_pages, audio_dir, no_screening = TRUE),
+    page_calibrate(9L, num_pages, audio_dir, no_screening = TRUE),
+    page_calibrate(10L, num_pages, audio_dir, no_screening = TRUE),
+    page_calibrate(11L, num_pages, audio_dir, no_screening = TRUE)
+  )
+  elts
+}
+
+

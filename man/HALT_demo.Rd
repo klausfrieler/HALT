@@ -5,23 +5,18 @@
 \title{Demo HALT}
 \usage{
 HALT_demo(
-  num_items = 3L,
-  feedback = NULL,
   config = HALT::auto_config(use_scc = T),
+  no_screening = TRUE,
   admin_password = "demo",
   researcher_email = "",
   dict = HALT::HALT_dict,
-  language = "en",
-  ...
+  language = "en"
 )
 }
 \arguments{
-\item{num_items}{(Integer scalar) Number of items in the RAT test.}
-
-\item{feedback}{(Function) Defines the feedback to give the participant
-at the end of the test. Defaults to a graph-based feedback page.}
-
 \item{config}{(HALT_config object) A HALT_config object, generate with HATL::make_config() or auto_config() (default).}
+
+\item{no_screening}{(Scalar booelan) Whether to use the screening part or not.}
 
 \item{admin_password}{(Scalar character) Password for accessing the admin panel.
 Defaults to \code{"demo"}.}
@@ -37,9 +32,8 @@ the email address of this package's developer.}
 \item{language}{The language you want to run your demo in.
 Possible languages include English (\code{"EN"}) and German (\code{"DE"}).
 The first language is selected by default}
-
-\item{...}{Further arguments to be passed to \code{\link{RAT}()}.}
 }
 \description{
-This function launches a demo for the HALT, which is wrapped around a RAT test.
+This function launches a demo for the HALT, which is just a wrapper to HALT_standalong with an no_screening flag.
+This function launches a demo for the HALT, which is just a wrapper to HALT_standalong with an no_screening flag.
 }

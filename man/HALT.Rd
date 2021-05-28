@@ -8,6 +8,7 @@ HALT(
   label = "HALT",
   config = HALT::auto_config(),
   audio_dir = "https://media.gold-msi.org/test_materials/HLT",
+  no_screening = FALSE,
   dict = HALT::HALT_dict
 )
 }
@@ -19,6 +20,8 @@ Use the functions auto_config() or make_config() to generate this or provide a f
 See also the documentation there for further explanations.}
 
 \item{audio_dir}{(url). The URL of the directory containing the stimuli.}
+
+\item{no_screening}{(Scalar boolean). Whether to include screening parts or not.}
 
 \item{dict}{The psychTestR dictionary used for internationalisation.}
 }
