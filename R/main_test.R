@@ -73,7 +73,7 @@ count_page <- function(){
     ), dict = HALT::HALT_dict)
 }
 
-main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
+main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict, type = "loud") {
   #parseAB <-  parse_testAB_strategy(test_AB_strategy)
   if(is.character(config)){
     if(file.exists(config)){
@@ -88,8 +88,8 @@ main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
   max_count <- config$loop_exclude
   elts <- psychTestR::join(
 
-    page_po1(audio_dir, num_pages),
-    page_force_correct(2L, num_pages, config, audio_dir),
+    page_po1(audio_dir, num_pages, type = type),
+    page_force_correct(2L, num_pages, config, audio_dir, type = type),
     psychTestR::conditional(
       test = function(state, ...){
         if(config$lr_audio_exclude  == FALSE){
@@ -103,7 +103,7 @@ main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
       logic = HALT_stop_page(dict)),
     #page_calibrate(3L, num_pages,  audio_dir),
     page_po4(config, audio_dir, num_pages),
-    page_po5(config, audio_dir, num_pages),
+    page_po5(config, audio_dir, num_pages, type = type),
     device_page(num_pages, config),
     if(config$use_scc) psychTestR::conditional(
       test = function(state, ...){
@@ -111,9 +111,9 @@ main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
         length(config$devices) < 2 && !has_admissable_device
       },
       logic = scc_page(dict, config)),
-    page_ABC_section(6L, num_pages, audio_dir),
-    page_ABC_section(7L, num_pages, audio_dir),
-    page_ABC_section(13L, num_pages, audio_dir),
+    page_ABC_section(6L, num_pages, audio_dir, type = type),
+    page_ABC_section(7L, num_pages, audio_dir, type = type),
+    page_ABC_section(13L, num_pages, audio_dir, type = type),
     psychTestR::code_block(
       get_device(config)
     ),
@@ -121,15 +121,15 @@ main_test <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
                             logic = HALT_stop_page(dict)),
     psychTestR::conditional(test = test_device(config = config),
                             logic = page_calibrate(8L, num_pages, audio_dir)),
-    page_calibrate(9L, num_pages, audio_dir),
-    page_calibrate(10L, num_pages, audio_dir),
-    page_calibrate(11L, num_pages, audio_dir)
+    page_calibrate(9L, num_pages, audio_dir, type = type),
+    page_calibrate(10L, num_pages, audio_dir, type = type),
+    page_calibrate(11L, num_pages, audio_dir, type = type)
   )
   elts
 }
 
 
-main_test_no_screening <- function(label, audio_dir, config, dict = HALT::HALT_dict) {
+main_test_no_screening <- function(label, audio_dir, config, dict = HALT::HALT_dict, type = type) {
   #parseAB <-  parse_testAB_strategy(test_AB_strategy)
   if(is.character(config)){
     if(file.exists(config)){
@@ -144,7 +144,7 @@ main_test_no_screening <- function(label, audio_dir, config, dict = HALT::HALT_d
   max_count <- config$loop_exclude
   elts <- psychTestR::join(
 
-    page_po1(audio_dir, num_pages, no_screening = TRUE),
+    page_po1(audio_dir, num_pages, no_screening = TRUE, type = type),
     page_force_correct(2L, num_pages, config, audio_dir, no_screening = TRUE),
     psychTestR::conditional(
       test = function(state, ...){

@@ -36,6 +36,7 @@ HALT_standalone  <- function(title = NULL,
                             audio_dir = "https://media.gold-msi.org/test_materials/HLT",
                             validate_id = "auto",
                             ...) {
+
   elts <- psychTestR::join(
     if(with_id)
       psychTestR::new_timeline(

@@ -26,10 +26,12 @@ HALT <- function(label = "HALT",
   stopifnot(is(config, "HALT_config") || is.character(config) && file.exists(config))
   stopifnot(purrr::is_scalar_character(label))
   stopifnot(purrr::is_scalar_character(audio_dir))
+
+
   audio_dir <- gsub("/$", "", audio_dir)
-  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict)
+  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict, type = config$volume_level)
   if(no_screening){
-    main_test <- main_test_no_screening(label = label, audio_dir = audio_dir, config, dict = dict)
+    main_test <- main_test_no_screening(label = label, audio_dir = audio_dir, config, dict = dict, type = config$volume_level)
   }
 
   psychTestR::join(

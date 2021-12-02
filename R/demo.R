@@ -25,7 +25,7 @@ HALT_demo <- function(config = HALT::auto_config(use_scc = T),
                       dict = HALT::HALT_dict,
                       language = "en") {
   elts <- psychTestR::join(
-    HALT::HALT(dict = dict, no_screening = no_screening),
+    HALT::HALT(dict = dict, config = config, no_screening = no_screening),
     psychTestR::final_page(body = "")
   )
   title = "HALT Demo"

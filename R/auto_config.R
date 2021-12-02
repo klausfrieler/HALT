@@ -25,7 +25,8 @@ auto_config <- function(baserate_hp = 211/1194,
                         loop_exclude = 5L,
                         lr_img_exclude = TRUE,
                         lr_audio_exclude = TRUE,
-                        devices_exclude = TRUE
+                        devices_exclude = TRUE,
+                        volume_level = "-8.4 LUFS"
                         ) {
   stopifnot(all(devices %in% c("HP","LS")),
             length(devices) <= 2,
@@ -34,6 +35,7 @@ auto_config <- function(baserate_hp = 211/1194,
             baserate_hp < 1,
             baserate_hp > 0,
             #as.integer(loop_exclude) == as.double(integer),
+            volume_level %in% c("-8.4 LUFS", "-20.0 LUFS"),
             loop_exclude > 0
             )
   if(length(devices) > 1){
@@ -73,6 +75,7 @@ auto_config <- function(baserate_hp = 211/1194,
            lr_img_exclude = lr_img_exclude, lr_audio_exclude = lr_audio_exclude,
            devices_exclude = devices_exclude) %>% as.list()
   config$devices <- devices
+  config$volume_level <- c("-8.4 LUFS" = "loud",  "-20.0 LUFS" = "quiet")[volume_level] %>% as.vector()
   attr(config, "class") <- c(attr(config, "class"), "HALT_config")
   return(config)
 }
@@ -174,12 +177,14 @@ make_config <- function(combination_method,
                         loop_exclude = 5L,
                         lr_img_exclude = TRUE,
                         lr_audio_exclude = TRUE,
-                        devices_exclude = TRUE) {
+                        devices_exclude = TRUE,
+                        volume_level = "-8.4 LUFS") {
   stopifnot(combination_method %in% 1:18,
             all(c(A_threshold, B_threshold, C_threshold) %in% 0:6),
             baserate_hp < 1,
             baserate_hp > 0,
             loop_exclude > 0,
+            volume_level %in% c("-8.4 LUFS", "-20.0 LUFS"),
             #as.integer(loop_exclude) == as.double(integer),
             #is.logical(c(lr_img_exclude, lr_audio_exclude, devices_exclude)),
             all(devices %in% c("HP","LS"))
@@ -195,7 +200,6 @@ make_config <- function(combination_method,
   if(combination_method %in% c(2,3,6,7)){A_threshold <- 0}
   if(combination_method %in% c(1,3,8,9)){B_threshold <- 0}
   if(combination_method %in% c(1,2,4,5)){C_threshold <- 0}
-
   config <- tibble("combination_method" = combination_method,
                    "A_threshold" = A_threshold,
                    "B_threshold" = B_threshold,
@@ -205,7 +209,8 @@ make_config <- function(combination_method,
                    loop_exclude = loop_exclude,
                    lr_img_exclude = lr_img_exclude,
                    lr_audio_exclude = lr_audio_exclude,
-                   devices_exclude = devices_exclude) %>% as.list()
+                   devices_exclude = devices_exclude,
+                   volume_level = volume_level) %>% as.list()
   config$devices <- devices
   attr(config, "class") <- c(attr(config, "class"), "HALT_config")
 

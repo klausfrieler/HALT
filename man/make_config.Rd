@@ -15,7 +15,8 @@ make_config(
   loop_exclude = 5L,
   lr_img_exclude = TRUE,
   lr_audio_exclude = TRUE,
-  devices_exclude = TRUE
+  devices_exclude = TRUE,
+  volume_level = "-8.4 LUFS"
 )
 }
 \arguments{
