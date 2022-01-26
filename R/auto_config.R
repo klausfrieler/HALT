@@ -12,9 +12,9 @@
 #'
 #' @param use_scc (boolean, default = F) Flag whether "Split, Convince, Compare" page shall be shown.
 #' @param loop_exclude (integer, default = 5) Number of loops for item po2.
-#' @param lr_img_exclude (boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusiogn.
-#' @param lr_audio_exclude (boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusiogn.
-#' @param devices_exclude (boolean, default = T) Flag, if wrong answer on left-right device question shall lead to exclusiogn.
+#' @param lr_img_exclude (boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusion.
+#' @param lr_audio_exclude (boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusion.
+#' @param devices_exclude (boolean, default = T) Flag, if wrong answer on left-right device question shall lead to exclusion.
 #' @references
 #' \insertRef{HALTpaper}{HALT}
 #' @export
