@@ -47,6 +47,8 @@ auto_config <- function(volume_level = "-8.4 LUFS",
   }
   if(screening_parts) {
     channel_check <- TRUE
+  } else {
+    use_scc <- FALSE
   }
 
   tests <- HALT::test_config  %>% filter(true_ls_rate > 0.5, true_hp_rate > 0.5)
@@ -207,6 +209,8 @@ make_config <- function(volume_level = "-8.4 LUFS",
             )
   if(screening_parts) {
     channel_check <- TRUE
+  } else {
+    use_scc <- FALSE
   }
   if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0){stop(sprintf("combination_method = %i needs A_threshold > 0!", combination_method))}
   if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){stop(sprintf("combination_method = %i needs B_threshold > 0!", combination_method))}
