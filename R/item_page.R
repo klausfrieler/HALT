@@ -282,19 +282,34 @@ select_left_right <- function(direction){
 }
 
 
-get_page_counter <- function(page_no, num_pages, ABC_offset = 0L, no_screening = FALSE){
+get_page_counter <- function(page_no, num_pages, ABC_offset = 0L, config){
   orig_page <- page_no
   if(is.null(num_pages) || is.na(num_pages) || num_pages < 1){
     return(shiny::div(""))
   }
-  counter_map <-c("1" = 1L, "2" = 2L, "3" = 3L, "4" = 4L, "5" = 5L, "device" = 6L, "6" = 7L,
-                  "7" = 13L, "13" = 19L, "8" = 26L, "9" = 27L, "10" = 28L, "11" = 29L)
-  if(no_screening){
-    counter_map <-c("1" = 1L, "2" = 2L, "3" = 3L, "4" = 4L, "5" = 5L, "device" = 6L,
-                    "8" = 7L, "9" = 8L, "10" = 9L, "11" = 10L)
-
+  counter_map <-c("1" = 1L, "2" = 2L)
+  if (config$channel_check) {
+    counter_map <- append(counter_map, c("4" = 3L, "5" = 4L, "device" = 5L))
+    if (config$screening_parts) {
+      counter_map <- append(counter_map, c("6" = 6L, "7" = 12L, "13" = 18L))
+      if(config$frequency_check) {
+        counter_map <- append(counter_map,
+                              c("8" = 24L, "9" = 25L, "10" = 26L, "11" = 27L))
+      }
+    } else {
+      if (config$frequency_check) {
+        counter_map <- append(counter_map,
+                              c("8" = 6L, "9" = 7L, "10" = 8L, "11" = 9L))
+      }
+    }
+  } else {
+    counter_map <- append(counter_map, c("device" = 3L))
+    if (config$frequency_check) {
+      counter_map <- append(counter_map,
+                            c("8" = 4L, "9" = 5L, "10" = 6L, "11" = 7L))
+    }
   }
-  num_pages <- max(counter_map)
+  #num_pages <- max(counter_map)
   counter <- as.character(counter_map[as.character(page_no)] + ABC_offset)
   #messagef("Page_no %s, num_pages = %d, ABC_offset = %d, counter = %s", page_no, num_pages, ABC_offset, counter)
 
