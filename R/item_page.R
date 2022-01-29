@@ -326,9 +326,9 @@ warning_page <- function(label, warning_message){
     dict = HALT::HALT_dict)
 }
 
-HALT_base_page <- function(page_no, sub_id, num_pages, audio_dir, save_answer = T, no_screening = FALSE, type = "loud"){
+HALT_base_page <- function(page_no, sub_id, num_pages, audio_dir, save_answer = T, config = HALT::auto_config(), type = "loud"){
   audio_text_page(page_no, sub_id,
-                  prompt = shiny::div(get_page_counter(page_no, num_pages, no_screening = no_screening),
+                  prompt = shiny::div(get_page_counter(page_no, num_pages, config = config),
                                       shiny::div(psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)),
                                                  style = HALT_standard_style),
                                       shiny::p("")),
@@ -389,7 +389,7 @@ test_force_loop <- function(page_no, max_count, correct_answer = "correct"){
 }
 
 
-left_right_page <- function(audio_dir, right_first, num_pages, no_screening = FALSE){
+left_right_page <- function(audio_dir, right_first, num_pages, config = HALT::auto_config()){
   perm <- c(1L, 2L)
   if(right_first){
     perm <- c(2L, 1L)
@@ -406,7 +406,7 @@ left_right_page <- function(audio_dir, right_first, num_pages, no_screening = FA
   }
   psychTestR::new_timeline(
     psychTestR::NAFC_page("po4",
-                          prompt = shiny::div(get_page_counter(4L, num_pages, no_screening = no_screening),
+                          prompt = shiny::div(get_page_counter(4L, num_pages, config = config),
                                               shiny::div(psychTestR::i18n("THLT_0004_PROMPT"),
                                                          style = HALT_standard_style),
                                               shiny::p(shiny::img(src = img_url,
@@ -469,13 +469,13 @@ scc_page <- function(dict = HALT::HALT_dict, config){
 }
 
 #Creating main pages functions
-page_po1 <- function(audio_dir, num_pages, no_screening = FALSE, type = "loud"){
+page_po1 <- function(audio_dir, num_pages, config = HALT::auto_config(), type = "loud"){
   messagef("page_po1: %d", num_pages)
 
   psychTestR::new_timeline(
     volume_calibration_page(
       url = get_audio_url(audio_dir, 1L, "", type = type),
-      prompt = shiny::div(get_page_counter(1L, num_pages, no_screening = no_screening),
+      prompt = shiny::div(get_page_counter(1L, num_pages, config = config),
                           shiny::div(psychTestR::i18n("THLT_0001_PROMPT"),
                                      style = HALT_standard_style),
                           shiny::p("")),
@@ -512,26 +512,26 @@ page_po4_old <- function(audio_dir, config, num_pages){
       )))
 }
 
-page_po4 <- function(config, audio_dir, num_pages, no_screening = FALSE){
+page_po4 <- function(config, audio_dir, num_pages, config = HALT::auto_config()){
   messagef("page_po4: %d", num_pages)
   psychTestR::join(
       psychTestR::conditional(test = select_left_right("left"),
-                              logic = left_right_page(audio_dir, right_first = F, num_pages, no_screening = no_screening)),
+                              logic = left_right_page(audio_dir, right_first = F, num_pages, config = config)),
       psychTestR::conditional(test = select_left_right("right"),
-                              logic = left_right_page(audio_dir, right_first = T, num_pages, no_screening = no_screening)),
+                              logic = left_right_page(audio_dir, right_first = T, num_pages, config = config)),
       psychTestR::conditional(test = test_answer(page_no = 4L, config, "right"),
                               logic = HALT_stop_page()))
 }
 
 
-page_po5 <- function(config, audio_dir, num_pages, no_screening = FALSE, type = "loud"){
+page_po5 <- function(config, audio_dir, num_pages, config = HALT::auto_config(), type = "loud"){
   psychTestR::join(
-    page_calibrate(page_no = 5L, num_pages, audio_dir = audio_dir, save_answer = T, no_screening = no_screening, type = type),
+    page_calibrate(page_no = 5L, num_pages, audio_dir = audio_dir, save_answer = T, config = config, type = type),
     psychTestR::conditional(test = test_answer(page_no = 5L, config, "stereo channels correct", invert = T),
                             logic = HALT_stop_page()))
 }
 
-page_force_correct <- function(page_no, num_pages, config, audio_dir, no_screening = FALSE, type = "loud"){
+page_force_correct <- function(page_no, num_pages, config, audio_dir, config = HALT::auto_config(), type = "loud"){
   warning_label <- sprintf("warning_po%d", page_no)
   psychTestR::join(
     psychTestR::code_block(
@@ -547,7 +547,7 @@ page_force_correct <- function(page_no, num_pages, config, audio_dir, no_screeni
                                 logic = warning_page(warning_label, "WARNING_TOO_QUIET")),
         psychTestR::conditional(test = test_answer(page_no, config, "imprecise"),
                                 logic = warning_page(warning_label, "WARNING_IMPRECISE")),
-        page_calibrate(page_no = page_no, num_pages, audio_dir = audio_dir, save_answer = T, no_screening = no_screening, type = type),
+        page_calibrate(page_no = page_no, num_pages, audio_dir = audio_dir, save_answer = T, config = config, type = type),
         psychTestR::code_block(function(state, ...){
           counter <- psychTestR::get_local(key = sprintf("po%d_counter", page_no), state)
           psychTestR::set_local(key = sprintf("po%d_counter", page_no), value = counter + 1L, state)
@@ -556,7 +556,7 @@ page_force_correct <- function(page_no, num_pages, config, audio_dir, no_screeni
     ))
 }
 
-page_calibrate <- function(page_no, num_pages, audio_dir, save_answer = T, no_screening = FALSE, type = "loud"){
+page_calibrate <- function(page_no, num_pages, audio_dir, save_answer = T, config = HALT::auto_config(), type = "loud"){
   psychTestR::new_timeline(
     psychTestR::join(
       psychTestR::code_block(function(state, ...){
@@ -567,7 +567,7 @@ page_calibrate <- function(page_no, num_pages, audio_dir, save_answer = T, no_sc
       }),
       psychTestR::reactive_page(function(state, ...){
         selection <- psychTestR::get_local("current_selection", state)
-        HALT_base_page(page_no, selection, num_pages, audio_dir, save_answer, no_screening = no_screening, type = type)
+        HALT_base_page(page_no, selection, num_pages, audio_dir, save_answer, config = config, type = type)
       }))
     , dict = HALT::HALT_dict)
 }
