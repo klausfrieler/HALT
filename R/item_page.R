@@ -224,7 +224,7 @@ HALT_audio_NAFC_page <- function(page_no,
   audio_url <- get_audio_url(audio_dir, page_no, sub_id, type = type)
   correct_answers <- get_item(page_no, sub_id, "correct_answer", type = type)
   messagef("Page no: %d, sub id = %s, correct: %s", page_no, sub_id, correct_answers)
-  prompt <- shiny::div(get_page_counter(page_no, num_pages, ABC_offset),
+  prompt <- shiny::div(get_page_counter(page_no, num_pages, ABC_offset, config),
                        shiny::div(
                          psychTestR::i18n(sprintf("THLT_%04d_PROMPT", page_no)),
                          label,
@@ -446,7 +446,7 @@ device_page <- function(num_pages, config){
 
   psychTestR::new_timeline(
     psychTestR::NAFC_page("device_screening",
-                          prompt = shiny::div(get_page_counter("device", num_pages),
+                          prompt = shiny::div(get_page_counter("device", num_pages, config = config),
                                               shiny::div(psychTestR::i18n("DEVICE_PROMPT"),
                                                          style = HALT_standard_style)),
                           choices = as.character(1:6),
