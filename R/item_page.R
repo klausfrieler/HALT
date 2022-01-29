@@ -512,7 +512,7 @@ page_po4_old <- function(audio_dir, config, num_pages){
       )))
 }
 
-page_po4 <- function(config, audio_dir, num_pages, config = HALT::auto_config()){
+page_po4 <- function(config, audio_dir, num_pages){
   messagef("page_po4: %d", num_pages)
   psychTestR::join(
       psychTestR::conditional(test = select_left_right("left"),
@@ -524,14 +524,14 @@ page_po4 <- function(config, audio_dir, num_pages, config = HALT::auto_config())
 }
 
 
-page_po5 <- function(config, audio_dir, num_pages, config = HALT::auto_config(), type = "loud"){
+page_po5 <- function(config, audio_dir, num_pages, type = "loud"){
   psychTestR::join(
     page_calibrate(page_no = 5L, num_pages, audio_dir = audio_dir, save_answer = T, config = config, type = type),
     psychTestR::conditional(test = test_answer(page_no = 5L, config, "stereo channels correct", invert = T),
                             logic = HALT_stop_page()))
 }
 
-page_force_correct <- function(page_no, num_pages, config, audio_dir, config = HALT::auto_config(), type = "loud"){
+page_force_correct <- function(page_no, num_pages, config, audio_dir, type = "loud"){
   warning_label <- sprintf("warning_po%d", page_no)
   psychTestR::join(
     psychTestR::code_block(
