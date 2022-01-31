@@ -218,7 +218,8 @@ HALT_audio_NAFC_page <- function(page_no,
                                  audio_dir,
                                  save_answer = TRUE,
                                  admin_ui = NULL,
-                                 type = "loud"){
+                                 type = "loud",
+                                 config){
   label <- sprintf("po%d%s", page_no, sub_id)
   stopifnot(purrr::is_scalar_character(label))
   audio_url <- get_audio_url(audio_dir, page_no, sub_id, type = type)
@@ -572,7 +573,7 @@ page_calibrate <- function(page_no, num_pages, audio_dir, save_answer = T, confi
     , dict = HALT::HALT_dict)
 }
 
-page_ABC_section <- function(page_no, num_pages, audio_dir, type = "loud"){
+page_ABC_section <- function(page_no, num_pages, audio_dir, type = "loud", config){
   psychTestR::new_timeline(
     psychTestR::join(
       psychTestR::code_block(
@@ -599,7 +600,8 @@ page_ABC_section <- function(page_no, num_pages, audio_dir, type = "loud"){
                                  num_pages, counter,
                                  audio_dir = audio_dir,
                                  save_answer = T,
-                                 type = type)
+                                 type = type,
+                                 config = config)
           }
           ),
           psychTestR::code_block(function(state, ...) {

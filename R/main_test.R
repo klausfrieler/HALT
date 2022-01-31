@@ -135,9 +135,9 @@ main_test <- function(label,
   if (config$screening_parts) {
     elts <- psychTestR::join(
       elts,
-      page_ABC_section(6L, num_pages, audio_dir, type = type),
-      page_ABC_section(7L, num_pages, audio_dir, type = type),
-      page_ABC_section(13L, num_pages, audio_dir, type = type),
+      page_ABC_section(6L, num_pages, audio_dir, type = type, config = config),
+      page_ABC_section(7L, num_pages, audio_dir, type = type, config = config),
+      page_ABC_section(13L, num_pages, audio_dir, type = type, config = config),
       psychTestR::code_block(
         get_device(config)
       ),
