@@ -47,6 +47,8 @@ auto_config <- function(volume_level = "-8.4 LUFS",
   }
   if(screening_parts) {
     channel_check <- TRUE
+    lr_img_exclude <- TRUE
+    lr_audio_exclude <- TRUE
   } else {
     use_scc <- FALSE
   }
@@ -193,36 +195,44 @@ make_config <- function(volume_level = "-8.4 LUFS",
                         A_threshold,
                         B_threshold,
                         C_threshold,
-                        baserate_hp, devices,
+                        baserate_hp,
+                        devices,
                         use_scc = FALSE,
                         devices_exclude = TRUE) {
-  stopifnot(combination_method %in% 1:18,
-            all(c(A_threshold, B_threshold, C_threshold) %in% 0:6),
-            baserate_hp < 1,
-            baserate_hp > 0,
-            loop_exclude > 0,
+  stopifnot(is.logical(c(screening_parts, channel_check, frequency_check)),
             volume_level %in% c("-8.4 LUFS", "-20.0 LUFS"),
-            #as.integer(loop_exclude) == as.double(integer),
-            #is.logical(c(lr_img_exclude, lr_audio_exclude, devices_exclude)),
-            all(devices %in% c("HP","LS")),
-            is.logical(c(screening_parts, channel_check, frequency_check))
-            )
-  if(screening_parts) {
+            loop_exclude > 0)
+  if (screening_parts) {
     channel_check <- TRUE
+    lr_img_exclude <- TRUE
+    lr_audio_exclude <- TRUE
+    stopifnot(combination_method %in% 1:18,
+              all(c(A_threshold, B_threshold, C_threshold) %in% 0:6),
+              baserate_hp < 1,
+              baserate_hp > 0,
+              all(devices %in% c("HP", "LS")))
+    if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0){stop(sprintf("combination_method = %i needs A_threshold > 0!", combination_method))}
+    if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){stop(sprintf("combination_method = %i needs B_threshold > 0!", combination_method))}
+    if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){stop(sprintf("combination_method = %i needs C_threshold > 0!", combination_method))}
+    # set unused test's thresholds to 0
+    if(combination_method %in% c(2,3,6,7)){A_threshold <- 0}
+    if(combination_method %in% c(1,3,8,9)){B_threshold <- 0}
+    if(combination_method %in% c(1,2,4,5)){C_threshold <- 0}
+    if(length(devices) > 1){
+      use_scc <- FALSE
+      device_exclude <- FALSE
+    }
   } else {
     use_scc <- FALSE
+    stopifnot(is.logical(c(lr_img_exclude, lr_audio_exclude)))
+    A_threshold <- 6
+    B_threshold <- 6
+    C_threshold <- 6
+    combination_method <- 12
+    devices <- c("HP", "LS")
+    baserate_hp <- 211/1194
   }
-  if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0){stop(sprintf("combination_method = %i needs A_threshold > 0!", combination_method))}
-  if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){stop(sprintf("combination_method = %i needs B_threshold > 0!", combination_method))}
-  if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){stop(sprintf("combination_method = %i needs C_threshold > 0!", combination_method))}
-  if(length(devices) > 1){
-    use_scc <- FALSE
-    device_exclude <- FALSE
-  }
-  # set unused test's thresholds to 0
-  if(combination_method %in% c(2,3,6,7)){A_threshold <- 0}
-  if(combination_method %in% c(1,3,8,9)){B_threshold <- 0}
-  if(combination_method %in% c(1,2,4,5)){C_threshold <- 0}
+
   config <- tibble(volume_level = volume_level,
                    loop_exclude = loop_exclude,
                    channel_check = channel_check,
