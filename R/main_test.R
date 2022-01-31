@@ -91,7 +91,7 @@ main_test <- function(label,
     config$use_scc <-- FALSE
   }
   num_ABC_items <- ifelse(config$screening_parts, 18, 0)
-  num_pages <- 2 + num_ABC_items + ifelse(config$channel_check, 2, 0) +
+  num_pages <- 3 + num_ABC_items + ifelse(config$channel_check, 2, 0) +
     ifelse(config$frequency_check, 4, 0)
   p04_max_count <- ifelse(config$lr_img_exclude, 0, 1)
   max_count <- config$loop_exclude
