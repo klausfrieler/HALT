@@ -52,6 +52,7 @@ get_audio_ui <- function(url,
     oncanplaythrough = media_js$show_media_btn,
     onplay = paste0(media_js$media_played, media_js$hide_media_btn),
     controls = if (show_controls) "controls",
+    controlsList = "nodownload",
     #onended = if (wait) paste0(media_js$show_responses, media_js$hide_media) else "null",
     onended = if (wait) media_js$show_responses else "null"
   )
