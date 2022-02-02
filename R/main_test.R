@@ -148,20 +148,20 @@ main_test <- function(label,
       elts <- psychTestR::join(
         elts,
         psychTestR::conditional(test = test_device(config = config),
-                                logic = page_calibrate(8L, num_pages, audio_dir, type = type)),
-        page_calibrate(9L, num_pages, audio_dir, type = type),
-        page_calibrate(10L, num_pages, audio_dir, type = type),
-        page_calibrate(11L, num_pages, audio_dir, type = type)
+                                logic = page_calibrate(8L, num_pages, audio_dir, config = config, type = type)),
+        page_calibrate(9L, num_pages, audio_dir, config = config, type = type),
+        page_calibrate(10L, num_pages, audio_dir, config = config, type = type),
+        page_calibrate(11L, num_pages, audio_dir, config = config, type = type)
       )
     }
   } else {
     if (config$frequency_check) {
       elts <- psychTestR::join(
         elts,
-        page_calibrate(8L, num_pages, audio_dir, type = type),
-        page_calibrate(9L, num_pages, audio_dir, type = type),
-        page_calibrate(10L, num_pages, audio_dir, type = type),
-        page_calibrate(11L, num_pages, audio_dir, type = type)
+        page_calibrate(8L, num_pages, audio_dir, config = config, type = type),
+        page_calibrate(9L, num_pages, audio_dir, config = config, type = type),
+        page_calibrate(10L, num_pages, audio_dir, config = config, type = type),
+        page_calibrate(11L, num_pages, audio_dir, config = config, type = type)
       )
     }
   }
