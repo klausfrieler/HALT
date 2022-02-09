@@ -5,17 +5,40 @@
 \title{Automatic configuration for the HALT module}
 \usage{
 auto_config(
+  volume_level = "-8.4 LUFS",
+  loop_exclude = 5L,
+  channel_check = TRUE,
+  lr_img_exclude = TRUE,
+  lr_audio_exclude = TRUE,
+  frequency_check = TRUE,
+  screening_parts = TRUE,
   baserate_hp = 211/1194,
   devices = "HP",
   use_scc = FALSE,
-  loop_exclude = 5L,
-  lr_img_exclude = TRUE,
-  lr_audio_exclude = TRUE,
-  devices_exclude = TRUE,
-  volume_level = "-8.4 LUFS"
+  devices_exclude = TRUE
 )
 }
 \arguments{
+\item{volume_level}{Volume level of the HALT stimuli in loudness units to full scale (integrated).
+Possible settings are \code{"-8.4 LUFS"} or \code{"-20.0 LUFS"}.
+You have to adjust your other stimuli to the selected LUFS value.
+Use \code{"-8.4 LUFS"} for highly compressed stimuli with low dynamic range.
+Use \code{"-20.0 LUFS"} for stimuli with normal to high dynamic range.}
+
+\item{loop_exclude}{(integer, default = 5) Number of loops for item po2.}
+
+\item{channel_check}{(boolean, default = T) Flag whether to include the tasks to check the channels.
+Will be set to \code{TRUE} if \code{screening_parts = TRUE}.}
+
+\item{lr_img_exclude}{(boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusion.}
+
+\item{lr_audio_exclude}{(boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusion.}
+
+\item{frequency_check}{(boolean, default = T) Flag whether to include the tasks to estimate the lower frequency limit of the playback device.}
+
+\item{screening_parts}{(boolean, default = T) Flag whether to include the headphone screening tasks.
+If \code{TRUE} the arguments \code{channel_check}, \code{lr_img_exclude}, and \code{lr_audio_exclude} will be set to \code{TRUE}.}
+
 \item{baserate_hp}{Sets the (estimated) prevalence of headphones in the
 target population as a number between 0 and 1. Defaults to the unbiased
 prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
@@ -23,15 +46,10 @@ prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
 \item{devices}{Sets the desired playback device. Possible settings are
 \code{"HP"} for headphones or \code{"LS"} for loudspeakers.}
 
-\item{use_scc}{(boolean, default = F) Flag whether "Split, Convince, Compare" page shall be shown.}
+\item{use_scc}{(boolean, default = F) Flag whether "Split, Convince, Compare" page shall be shown.
+Will be set to \code{FALSE} if \code{screening_parts = FALSE}.}
 
-\item{loop_exclude}{(integer, default = 5) Number of loops for item po2.}
-
-\item{lr_img_exclude}{(boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusiogn.}
-
-\item{lr_audio_exclude}{(boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusiogn.}
-
-\item{devices_exclude}{(boolean, default = T) Flag, if wrong answer on left-right device question shall lead to exclusiogn.}
+\item{devices_exclude}{(boolean, default = T) Flag, if a classification other than \code{device} shall lead to exclusion.}
 }
 \description{
 This functions determines the parameters of the psychTestR HALT function

@@ -10,11 +10,26 @@
 #' @param devices Sets the desired playback device. Possible settings are
 #' \code{"HP"} for headphones or \code{"LS"} for loudspeakers.
 #'
+#' @param volume_level
+#' Volume level of the HALT stimuli in loudness units to full scale (integrated).
+#' Possible settings are \code{"-8.4 LUFS"} or \code{"-20.0 LUFS"}.
+#' You have to adjust your other stimuli to the selected LUFS value.
+#' Use \code{"-8.4 LUFS"} for highly compressed stimuli with low dynamic range.
+#' Use \code{"-20.0 LUFS"} for stimuli with normal to high dynamic range.
+#'
+#' @param channel_check (boolean, default = T) Flag whether to include the tasks to check the channels.
+#' Will be set to \code{TRUE} if \code{screening_parts = TRUE}.
+#'
+#' @param frequency_check (boolean, default = T) Flag whether to include the tasks to estimate the lower frequency limit of the playback device.
+#'
+#' @param screening_parts (boolean, default = T) Flag whether to include the headphone screening tasks.
+#' If \code{TRUE} the arguments \code{channel_check}, \code{lr_img_exclude}, and \code{lr_audio_exclude} will be set to \code{TRUE}.
 #' @param use_scc (boolean, default = F) Flag whether "Split, Convince, Compare" page shall be shown.
+#' Will be set to \code{FALSE} if \code{screening_parts = FALSE}.
 #' @param loop_exclude (integer, default = 5) Number of loops for item po2.
 #' @param lr_img_exclude (boolean, default = T) Flag, if wrong answer on left-right image question shall lead to exclusion.
 #' @param lr_audio_exclude (boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusion.
-#' @param devices_exclude (boolean, default = T) Flag, if wrong answer on left-right device question shall lead to exclusion.
+#' @param devices_exclude (boolean, default = T) Flag, if a classification other than \code{device} shall lead to exclusion.
 #' @references
 #' \insertRef{HALTpaper}{HALT}
 #' @export
