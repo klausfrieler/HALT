@@ -1,3 +1,7 @@
+# HALT 0.11.0
+
+* components (screening parts, channel check, and frequency check) can be selected individually for inclusion in the test
+
 # HALT 0.9.2
 
 * Closing in on final version

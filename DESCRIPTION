@@ -1,10 +1,14 @@
 Package: HALT
 Type: Package
 Title: Headphone and Loudspeaker Test
-Version: 0.10.0
-Author: Klaus Frieler, Yves Wycisk
+Version: 0.11.0
+Authors@R: c(
+  person("Klaus", "Frieler", email = "kf@omniversum.de", role = c("aut", "cre")),
+  person("Yves", "Wycisk", email = "yves.wycisk@hmtm-hannover.de", role = c("aut")),
+  person("Kilian", "Sander", email = "kilian.sander@aol.com", role = c("aut"))
+  )
 Maintainer: Klaus Frieler <kf@omniversum.de>
-Description: Implementation of a headphone and loudspeaker detection test for online experiment.
+Description: Implementation of a headphone and loudspeaker test for online experiments.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -27,6 +31,6 @@ Suggests:
     knitr,
     rmarkdown
 Remotes: pmcharrison/psychTestR, klausfrieler/RAT
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 RdMacros: Rdpack
