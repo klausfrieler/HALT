@@ -267,3 +267,22 @@ make_config <- function(volume_level = "-8.4 LUFS",
 
   return(config)
 }
+#' Export config as csv
+#'
+#' This function exports a HALT config object as csv file.
+#'
+#' @param config object of class HALT_config
+#'
+#' @param file character string naming a file open for writing.
+#'
+#' @export
+export_config <- function(config,
+                          file = "") {
+  stopifnot(is(config, "HALT_config"))
+  attr(config, "class") <- "list"
+  write.table(as.data.frame(config),
+            file = file,
+            sep = ";",
+            row.names = FALSE,
+            quote = FALSE)
+}
