@@ -12,7 +12,7 @@
 #' consider using \code{\link{HALT_standalone}()}.
 #' @param label (Character scalar) Label to give the HALT results in the output file.
 #' @param config (object of class HALT_config or path to config file generated with HALTConfig)
-#' Use the functions auto_config() or make_config() to generate this or provide a filename of a config file generated with the HALTConfig Shiny App
+#' Use the functions \code{\link[=auto_config]{auto_config()}} or \code{\link[=make_config]{make_config()}} to generate this or provide a filename of a config file generated with the HALTConfig Shiny App
 #' See also the documentation there for further explanations.
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
 #' @param dict The psychTestR dictionary used for internationalisation.
