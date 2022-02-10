@@ -55,15 +55,7 @@ max_hp_pv <- function(baserate_hp = 211/1194) {
 max_ls_pv <- function(baserate_hp = 211/1194) {
   stopifnot(baserate_hp < 1,
             baserate_hp > 0)
-  tests <- HALT::test_config
-  tests$hp_pv <-
-    baserate_hp * tests$true_hp_rate / (baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$false_hp_rate)
-  tests$ls_pv <-
-    (1 - baserate_hp) * tests$true_ls_rate / ((1 - baserate_hp) * tests$true_ls_rate + baserate_hp * tests$false_ls_rate)
-  tests$utility <-
-    baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$true_ls_rate
-
-  tests <- tests %>% filter(ls_pv == max(ls_pv)) %>% dplyr::select(method, method_code, A, B, C, true_hp_rate, true_ls_rate, hp_pv, ls_pv, utility)
+  tests <- tests_pv_utility(baserate_hp = baserate_hp) %>% filter(ls_pv == max(ls_pv))
   tests
 }
 #' Maximum Utility maximizing percent correct
@@ -81,15 +73,7 @@ max_ls_pv <- function(baserate_hp = 211/1194) {
 max_utility <- function(baserate_hp = 211/1194) {
   stopifnot(baserate_hp < 1,
             baserate_hp > 0)
-  tests <- HALT::test_config
-  tests$hp_pv <-
-    baserate_hp * tests$true_hp_rate / (baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$false_hp_rate)
-  tests$ls_pv <-
-    (1 - baserate_hp) * tests$true_ls_rate / ((1 - baserate_hp) * tests$true_ls_rate + baserate_hp * tests$false_ls_rate)
-  tests$utility <-
-    baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$true_ls_rate
-
-  tests <- tests %>% filter(utility == max(utility)) %>% dplyr::select(method, method_code, A, B, C, true_hp_rate, true_ls_rate, hp_pv, ls_pv, utility)
+  tests <- tests_pv_utility(baserate_hp = baserate_hp) %>% filter(utility == max(utility))
   tests
 }
 #' Test procedures with maximum properties
@@ -236,13 +220,7 @@ a_priori_est <- function(baserate_hp = 211/1194,
             tolerance >= 0,
             as.integer(tolerance)==as.double(tolerance))
 
-  tests <- HALT::test_config
-  tests$hp_pv <-
-    baserate_hp * tests$true_hp_rate / (baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$false_hp_rate)
-  tests$ls_pv <-
-    (1 - baserate_hp) * tests$true_ls_rate / ((1 - baserate_hp) * tests$true_ls_rate + baserate_hp * tests$false_ls_rate)
-  tests$utility <-
-    baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$true_ls_rate
+  tests <- tests_pv_utility(baserate_hp = baserate_hp)
 
   q <- (qnorm(p = 1 - min_prob))^2
 
