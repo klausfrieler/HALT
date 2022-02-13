@@ -21,7 +21,7 @@ tests_pv_utility <- function(baserate_hp = 211/1194) {
     (1 - baserate_hp) * tests$true_ls_rate / ((1 - baserate_hp) * tests$true_ls_rate + baserate_hp * tests$false_ls_rate)
   tests$utility <-
     baserate_hp * tests$true_hp_rate + (1 - baserate_hp) * tests$true_ls_rate
-  tests <- tests %>% dplyr::select(method, method_code, A, B, C, true_hp_rate, true_ls_rate, hp_pv, ls_pv, utility)
+#  tests <- tests %>% dplyr::select(method, method_code, A, B, C, true_hp_rate, true_ls_rate, hp_pv, ls_pv, utility)
   tests
 }
 #' Maximum Headphones Predictive Value
