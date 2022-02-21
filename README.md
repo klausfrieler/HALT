@@ -117,15 +117,6 @@ where `shiny` is the username for the Shiny process user
 7. Navigate to your new shiny app, with a URL that looks like this:
 `http://my-web-page.org:3838/HALT
 
-## Implementation notes
-
-By default, the HALT  implementation always estimates participant abilities
-using weighted-likelihood estimation.
-We adopt weighted-likelihood estimation for this release 
-because this technique makes fewer assumptions about the participant group being tested.
-This makes the test better suited to testing with diverse participant groups
-(e.g. children, clinical populations).
-
 ## Usage notes
 
 - The HALT runs in your web browser.
