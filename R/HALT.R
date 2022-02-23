@@ -25,7 +25,9 @@ HALT <- function(label = "HALT",
   stopifnot(purrr::is_scalar_character(label))
   stopifnot(purrr::is_scalar_character(audio_dir))
 
-
+  if(is.character(config) && file.exists(config)) {
+    config <- import_config(config)
+  }
   audio_dir <- gsub("/$", "", audio_dir)
   main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict, type = config$volume_level)
 
