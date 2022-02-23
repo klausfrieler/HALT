@@ -289,3 +289,39 @@ export_config <- function(config,
             row.names = FALSE,
             quote = FALSE)
 }
+#' Import a csv config
+#'
+#' This function imports a csv config file as HALT config object.
+#'
+#' @param file character string naming the csv file
+#'
+#' @export
+import_config <- function(file) {
+  if(!is.scalar.character(file)) {
+    stop("'file' has to be a character scalar!")
+  } else {
+    if(!file.exists(file)) {
+      stop(sprintf("The file '%s' does not exist!", file))
+    }
+  }
+  configimport <- read.csv2(file = file)
+  configimport <- as.list(configimport)
+  if(configimport$devices == "HP,LS" || configimport$devices == "LS,HP") {
+    configimport$devices <- c("HP", "LS")
+  }
+  make_config(volume_level = configimport$volume_level,
+              loop_exclude = configimport$loop_exclude,
+              channel_check = configimport$channel_check,
+              lr_img_exclude = configimport$lr_img_exclude,
+              lr_audio_exclude = configimport$lr_audio_exclude,
+              frequency_check = configimport$frequency_check,
+              screening_parts = configimport$screening_parts,
+              combination_method = configimport$combination_method,
+              A_threshold = configimport$A_threshold,
+              B_threshold = configimport$B_threshold,
+              C_threshold = configimport$C_threshold,
+              baserate_hp = configimport$baserate_hp,
+              use_scc = configimport$use_scc,
+              devices_exclude = configimport$devices_exclude,
+              devices = configimport$devices)
+}
