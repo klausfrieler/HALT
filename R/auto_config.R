@@ -280,6 +280,9 @@ export_config <- function(config,
                           file = "") {
   stopifnot(is(config, "HALT_config"))
   attr(config, "class") <- "list"
+  if(all(config$devices == c("HP", "LS") || config$devices == c("LS", "HP"))) {
+    config$devices <- "HP,LS"
+  }
   write.table(as.data.frame(config),
             file = file,
             sep = ";",
