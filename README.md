@@ -73,7 +73,7 @@ and downloading your data.
 For more details on the psychTestR interface, 
 see http://psychtestr.com/.
 
-The HALT currently supports English (en) and German (de).
+The HALT currently supports English (`en`) and German (`de` [Du] and `de_f` [Sie]).
 You can select one of these languages by passing a language code as 
 an argument to `HALT_standalone()`, e.g. `HALT_standalone(languages = "de")`,
 or alternatively by passing it as a URL parameter to the test browser,
