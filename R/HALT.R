@@ -29,7 +29,8 @@ HALT <- function(label = "HALT",
     config <- import_config(config)
   }
   audio_dir <- gsub("/$", "", audio_dir)
-  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict, type = config$volume_level)
+  type <- c("-8.4 LUFS" = "loud",  "-20.0 LUFS" = "quiet")[config$volume_level] %>% as.vector()
+  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict, type = type)
 
   psychTestR::join(
     psychTestR::begin_module(label),

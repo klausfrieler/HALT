@@ -88,7 +88,6 @@ auto_config <- function(volume_level = "-8.4 LUFS",
       filter(hp_pv == max(hp_pv))
   }
 
-  volume_level <- c("-8.4 LUFS" = "loud",  "-20.0 LUFS" = "quiet")[volume_level] %>% as.vector()
   config <- tibble(volume_level = volume_level,
                    loop_exclude = loop_exclude,
                    channel_check = channel_check,
@@ -247,8 +246,6 @@ make_config <- function(volume_level = "-8.4 LUFS",
     devices <- c("HP", "LS")
     baserate_hp <- 211/1194
   }
-
-  volume_level <- c("-8.4 LUFS" = "loud",  "-20.0 LUFS" = "quiet")[volume_level] %>% as.vector()
 
   config <- tibble(volume_level = volume_level,
                    loop_exclude = loop_exclude,
