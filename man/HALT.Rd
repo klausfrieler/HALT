@@ -8,6 +8,7 @@ HALT(
   label = "HALT",
   config = HALT::auto_config(),
   audio_dir = "https://media.gold-msi.org/test_materials/HLT",
+  show_id = FALSE,
   dict = HALT::HALT_dict
 )
 }
@@ -19,6 +20,8 @@ Use the functions \code{\link[=auto_config]{auto_config()}} or \code{\link[=make
 See also the documentation there for further explanations.}
 
 \item{audio_dir}{(url). The URL of the directory containing the stimuli.}
+
+\item{show_id}{(boolean default = F) Flag whether question IDs should be displayed (e.g. for debugging)}
 
 \item{dict}{The psychTestR dictionary used for internationalisation.}
 }

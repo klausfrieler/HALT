@@ -15,11 +15,13 @@
 #' Use the functions \code{\link[=auto_config]{auto_config()}} or \code{\link[=make_config]{make_config()}} to generate this or provide a filename of a config file generated with the HALTConfig Shiny App
 #' See also the documentation there for further explanations.
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
+#' @param show_id (boolean default = F) Flag whether question IDs should be displayed (e.g. for debugging)
 #' @param dict The psychTestR dictionary used for internationalisation.
 #' @export
 HALT <- function(label = "HALT",
                  config = HALT::auto_config(),
                  audio_dir = "https://media.gold-msi.org/test_materials/HLT",
+                 show_id = FALSE,
                  dict = HALT::HALT_dict) {
   stopifnot(is(config, "HALT_config") || is.character(config) && file.exists(config))
   stopifnot(purrr::is_scalar_character(label))
@@ -30,7 +32,7 @@ HALT <- function(label = "HALT",
   }
   audio_dir <- gsub("/$", "", audio_dir)
   type <- c("-8.4 LUFS" = "loud",  "-20.0 LUFS" = "quiet")[config$volume_level] %>% as.vector()
-  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict, type = type)
+  main_test <-  main_test(label = label, audio_dir = audio_dir, config, dict = dict, type = type, show_id = show_id)
 
   psychTestR::join(
     psychTestR::begin_module(label),

@@ -77,6 +77,7 @@ main_test <- function(label,
                       audio_dir,
                       config,
                       dict = HALT::HALT_dict,
+                      show_id = FALSE,
                       type = "loud") {
   if(is.character(config)) {
     if(file.exists(config)) {
@@ -97,7 +98,7 @@ main_test <- function(label,
   max_count <- config$loop_exclude
   elts <- psychTestR::join(
     page_po1(audio_dir, num_pages, type = type),
-    page_force_correct(2L, num_pages, config, audio_dir, type = type),
+    page_force_correct(2L, num_pages, config, audio_dir, type = type, show_id = show_id),
     psychTestR::conditional(
       test = function(state, ...){
         if(config$lr_audio_exclude  == FALSE){
@@ -114,7 +115,7 @@ main_test <- function(label,
     elts <- psychTestR::join(
       elts,
       page_po4(config, audio_dir, num_pages),
-      page_po5(config, audio_dir, num_pages, type = type)
+      page_po5(config, audio_dir, num_pages, type = type, show_id = show_id)
     )
   }
   elts <- psychTestR::join(
@@ -135,35 +136,35 @@ main_test <- function(label,
   if (config$screening_parts) {
     elts <- psychTestR::join(
       elts,
-      page_ABC_section(6L, num_pages, audio_dir, type = type, config = config),
-      page_ABC_section(7L, num_pages, audio_dir, type = type, config = config),
-      page_ABC_section(13L, num_pages, audio_dir, type = type, config = config),
+      page_ABC_section(6L, num_pages, audio_dir, type = type, config = config, show_id = show_id),
+      page_ABC_section(7L, num_pages, audio_dir, type = type, config = config, show_id = show_id),
+      page_ABC_section(13L, num_pages, audio_dir, type = type, config = config, show_id = show_id),
       psychTestR::code_block(
         get_device(config)
       ),
       psychTestR::conditional(test = test_device(invert = T, config),
                               logic = HALT_stop_page(dict))
     )
+    #if (config$frequency_check) {
+    #  elts <- psychTestR::join(
+    #    elts,
+    #    psychTestR::conditional(test = test_device(config = config),
+    #                            logic = page_calibrate(8L, num_pages, audio_dir, config = config, type = type, show_id = show_id)),
+    #    page_calibrate(9L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
+    #    page_calibrate(10L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
+    #    page_calibrate(11L, num_pages, audio_dir, config = config, type = type, show_id = show_id)
+    #  )
+    #}
+  } #else {
     if (config$frequency_check) {
       elts <- psychTestR::join(
         elts,
-        psychTestR::conditional(test = test_device(config = config),
-                                logic = page_calibrate(8L, num_pages, audio_dir, config = config, type = type)),
-        page_calibrate(9L, num_pages, audio_dir, config = config, type = type),
-        page_calibrate(10L, num_pages, audio_dir, config = config, type = type),
-        page_calibrate(11L, num_pages, audio_dir, config = config, type = type)
+        page_calibrate(8L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
+        page_calibrate(9L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
+        page_calibrate(10L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
+        page_calibrate(11L, num_pages, audio_dir, config = config, type = type, show_id = show_id)
       )
     }
-  } else {
-    if (config$frequency_check) {
-      elts <- psychTestR::join(
-        elts,
-        page_calibrate(8L, num_pages, audio_dir, config = config, type = type),
-        page_calibrate(9L, num_pages, audio_dir, config = config, type = type),
-        page_calibrate(10L, num_pages, audio_dir, config = config, type = type),
-        page_calibrate(11L, num_pages, audio_dir, config = config, type = type)
-      )
-    }
-  }
+  #}
   elts
 }
