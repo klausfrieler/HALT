@@ -3,5 +3,5 @@
 #' Lists the languages available for HALT implementations.
 #' @export
 HALT_languages <- function() {
-  c("en", "de")
+  c("en", "de", "de_f")
 }

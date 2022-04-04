@@ -5,8 +5,7 @@
 \title{Demo HALT}
 \usage{
 HALT_demo(
-  config = HALT::auto_config(use_scc = T),
-  no_screening = TRUE,
+  config = HALT::auto_config(screening_parts = FALSE),
   admin_password = "demo",
   researcher_email = "",
   dict = HALT::HALT_dict,
@@ -15,8 +14,6 @@ HALT_demo(
 }
 \arguments{
 \item{config}{(HALT_config object) A HALT_config object, generate with HATL::make_config() or auto_config() (default).}
-
-\item{no_screening}{(Scalar booelan) Whether to use the screening part or not.}
 
 \item{admin_password}{(Scalar character) Password for accessing the admin panel.
 Defaults to \code{"demo"}.}
