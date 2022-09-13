@@ -3,9 +3,7 @@
 #' This function calculates the predictive values and the overall utility for a
 #' given prevalence for headphones.
 #'
-#' @param baserate_hp Sets the (estimated) prevalence of headphones in the
-#' target population as a number between 0 and 1. Defaults to the unbiased
-#' prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.
+#' @inheritParams auto_config
 #'
 #' @references
 #' \insertAllCited{}
@@ -199,8 +197,11 @@ post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_thresho
 #' If set to a value > 0 the function returns the screening procedures whose
 #' sample sizes exceed the minimum sample size by at most this value.
 #'
-#' @return probabilistic statement (explanation text) and a transposed data
-#' frame with the characteristics of the test procedure(s).
+#' @return A tibble (data frame) with the characteristics of the test
+#' procedure(s) and the attribute \code{explanation}.
+#' This attribute is intended as an explanatory text containing a
+#' probabilistic statement for the test procedure requiring the smallest sample
+#' size.
 #'
 #' @references
 #' \insertAllCited{}
@@ -208,7 +209,7 @@ post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_thresho
 a_priori_est <- function(baserate_hp = 211/1194,
                          devices = "HP",
                          min_number,
-                         min_prob,
+                         min_prob = .8,
                          tolerance = as.integer(0)) {
   stopifnot(baserate_hp < 1,
             baserate_hp > 0,
@@ -251,4 +252,77 @@ a_priori_est <- function(baserate_hp = 211/1194,
   attr(tests, "explanation") <- explanation
   # actual output
   tests
+}
+
+#' Calculate overall utilities and target device probabilities for SCC
+#'
+#' @inheritParams auto_config
+#'
+#' @param switch_to_target Sets the (estimated) switching prevalence.
+#' The switching prevalence describes the probability that a participant who
+#' indicates the use of a device other than the target device actually switches
+#' to the target device after being prompted to do so.
+#'
+#' @export
+tests_scc_utility <- function(baserate_hp = 211/1194,
+                              devices = "HP",
+                              switch_to_target = 3/4) {
+  stopifnot(baserate_hp < 1,
+            baserate_hp > 0,
+            switch_to_target < 1,
+            switch_to_target > 0,
+            length(devices) == 1L,
+            devices %in% c("HP", "LS"))
+  if (devices == "HP") {
+    tests <- tests_pv_utility(baserate_hp = switch_to_target)
+    tests$prob_scc_target <-
+      (baserate_hp + (1 - baserate_hp)*switch_to_target*tests$true_hp_rate) /
+      (baserate_hp + (1 - baserate_hp)*(switch_to_target*tests$true_hp_rate +
+                                          (1 - switch_to_target)*tests$false_hp_rate))
+  } else {
+    tests <- tests_pv_utility(baserate_hp = 1 - switch_to_target)
+    tests$prob_scc_target <-
+      (1 - baserate_hp + baserate_hp*switch_to_target*tests$true_ls_rate) /
+      (1 - baserate_hp + baserate_hp*(switch_to_target*tests$true_ls_rate +
+                                        (1 - switch_to_target)*tests$false_ls_rate))
+  }
+  tests <- tests %>% dplyr::rename(scc_hp_pv = hp_pv,
+                                   scc_ls_pv = ls_pv,
+                                   scc_utility = utility) %>%
+    mutate(scc_target = devices)
+  tests
+}
+
+#' A priori estimations for SCC
+#'
+#' @inheritParams a_priori_est
+#' @inheritParams tests_scc_utility
+#'
+#' @export
+a_priori_est_scc(baserate_hp = 211/1194,
+                 devices = "HP",
+                 switch_to_target = 3/4,
+                 min_number,
+                 min_prob = .8,
+                 tolerance = as.integer(0)) {
+  stopifnot(baserate_hp < 1,
+            baserate_hp > 0,
+            devices %in% c("HP","LS"),
+            min_number > 0,
+            as.integer(min_number) == as.double(min_number),
+            min_prob >= 0.6,
+            min_prob < 1,
+            tolerance >= 0,
+            as.integer(tolerance)==as.double(tolerance))
+  tests <- tests_scc_utility(baserate_hp = baserate_hp,
+                             devices = devices,
+                             switch_to_target = switch_to_target)
+
+  q <- (qnorm(p = 1 - min_prob))^2
+  p <- tests$prob_scc_target
+  a <- NA
+  b <- ((min_number - .5) / p)^2
+
+  tests$samplesize <-
+    - .5*a + sqrt((.5*a)^2 - b)
 }
