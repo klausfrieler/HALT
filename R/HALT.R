@@ -3,8 +3,9 @@
 
 #' HALT
 #'
-#' This function defines a HALT  module for incorporation into a
-#' psychTestR timeline.
+#' This function defines a Headphone and Loudspeaker Test
+#' \insertCite{@HALT; @HALT_1 and @HALT_2}{HALT} module for incorporation into
+#' a psychTestR timeline.
 #' Use this function if you want to include the HALT in a
 #' battery of other tests, or if you want to add custom psychTestR
 #' pages to your test timeline.
@@ -17,6 +18,10 @@
 #' @param audio_dir (url). The URL of the directory containing the stimuli.
 #' @param show_id (boolean default = F) Flag whether question IDs should be displayed (e.g. for debugging)
 #' @param dict The psychTestR dictionary used for internationalisation.
+#'
+#' @references
+#' \insertAllCited{}
+#'
 #' @export
 HALT <- function(label = "HALT",
                  config = HALT::auto_config(),

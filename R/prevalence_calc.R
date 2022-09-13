@@ -5,10 +5,10 @@
 #'
 #' @param baserate_hp Sets the (estimated) prevalence of headphones in the
 #' target population as a number between 0 and 1. Defaults to the unbiased
-#' prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.
+#' prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 tests_pv_utility <- function(baserate_hp = 211/1194) {
@@ -32,7 +32,7 @@ tests_pv_utility <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_hp_pv <- function(baserate_hp = 211/1194) {
@@ -49,7 +49,7 @@ max_hp_pv <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_ls_pv <- function(baserate_hp = 211/1194) {
@@ -67,7 +67,7 @@ max_ls_pv <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_utility <- function(baserate_hp = 211/1194) {
@@ -86,7 +86,7 @@ max_utility <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_properties <- function(baserate_hp = 211/1194) {
@@ -124,7 +124,7 @@ max_properties <- function(baserate_hp = 211/1194) {
 #' used.
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_threshold, baserate_hp, devices, samplesize, min_number = NULL, min_prob = NULL) {
@@ -203,7 +203,7 @@ post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_thresho
 #' frame with the characteristics of the test procedure(s).
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #' @export
 a_priori_est <- function(baserate_hp = 211/1194,
                          devices = "HP",

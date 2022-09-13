@@ -27,7 +27,7 @@ post_hoc_est(
 
 \item{baserate_hp}{Sets the (estimated) prevalence of headphones in the
 target population as a number between 0 and 1. Defaults to the unbiased
-prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
+prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.}
 
 \item{devices}{Sets the desired playback device. Possible settings are
 \code{"HP"} for headphones or \code{"LS"} for loudspeakers.}
@@ -59,5 +59,5 @@ Only one of the arguments \code{min_number} and \code{min_prob} can be
 used.
 }
 \references{
-\insertRef{HALTpaper}{HALT}
+\insertAllCited{}
 }

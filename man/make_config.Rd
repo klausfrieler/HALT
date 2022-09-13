@@ -53,7 +53,7 @@ If \code{TRUE} the arguments \code{channel_check}, \code{lr_img_exclude}, and \c
 
 \item{baserate_hp}{Sets the (estimated) prevalence of headphones in the
 target population as a number between 0 and 1. Defaults to the unbiased
-prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
+prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.}
 
 \item{devices}{Sets the desired playback device. Possible settings are
 \code{"HP"} for headphones or \code{"LS"} for loudspeakers.}
@@ -67,5 +67,5 @@ Will be set to \code{FALSE} if \code{screening_parts = FALSE}.}
 This function creates a configuration list for the psychTestR HALT function.
 }
 \references{
-\insertRef{HALTpaper}{HALT}
+\insertAllCited{}
 }
