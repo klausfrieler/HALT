@@ -327,6 +327,21 @@ a_priori_est_scc <- function(baserate_hp = 211/1194,
     - .5*a + sqrt((.5*a)^2 - b)
   )
 
-  tests$min_quality_percent <- 100*min_number/tests$samplesize
-  tests
+  if(devices == "HP") {
+    tests$expectation_total_participants <- ceiling(
+      tests$samplesize /
+        (baserate_hp + (1 - baserate_hp) *
+           (switch_to_target * tests$true_hp_rate + (1 - switch_to_target) * tests$false_hp_rate)
+         )
+    )
+  } else {
+    tests$expectation_total_participants <- ceiling(
+      tests$samplesize /
+        ((1 - baserate_hp) + baserate_hp *
+           ((1 - switch_to_target) * tests$false_ls_rate + switch_to_target * tests$true_ls_rate)
+         )
+    )
+  }
+  tests$min_quality_percent <- 100 * min_number / tests$samplesize
+  tests %>% dplyr::select(!c(false_hp_rate, false_ls_rate))
 }
