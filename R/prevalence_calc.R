@@ -352,3 +352,63 @@ a_priori_est_scc <- function(baserate_hp = 211/1194,
     filter(samplesize <= min(samplesize) + tolerance) %>%
     dplyr::arrange(samplesize, expectation_total_participants, min_quality_percent)
 }
+
+#' Post hoc estimation for SCC
+#'
+#' This function provides probabilistic statements about the composition of a
+#' sample after application of a certain test procedure within SCC. For this
+#' purpose a Binomial distribution is used.
+#'
+#' @inheritParams make_config
+#' @inheritParams tests_scc_utility
+#'
+#' @param target_selfreported Number of participants who reported the use of
+#' the target device.
+#'
+#' @param target_tested Number of participants who reported the use of a
+#' playback device other than the target device and got a test result
+#' indicating the use of the target device.
+#'
+post_hoc_est_scc <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             switch_to_target,
+                             devices,
+                             target_selfreported,
+                             target_tested,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(combination_method %in% 1:18,
+            all(c(A_threshold,B_threshold,C_threshold) %in% 0:6),
+            switch_to_target < 1,
+            switch_to_target > 0,
+            devices %in% c("HP","LS"),
+            as.integer(target_selfreported) == as.double(target_selfreported),
+            as.integer(target_tested) == as.double(target_tested),
+            ((min_number <= (target_selfreported + target_tested) & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+  )
+  if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0) {
+    stop(sprintf("combination_method = %i needs A_threshold > 0!",
+                 combination_method))
+  }
+  if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){
+    stop(sprintf("combination_method = %i needs B_threshold > 0!",
+                 combination_method))
+  }
+  if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){
+    stop(sprintf("combination_method = %i needs C_threshold > 0!",
+                 combination_method))
+  }
+  config <- make_config(combination_method = combination_method,
+                        A_threshold = A_threshold,
+                        B_threshold = B_threshold,
+                        C_threshold = C_threshold,
+                        baserate_hp = switch_to_target,
+                        devices = devices)
+  procedure <- tests_scc_utility(switch_to_target = switch_to_target,
+                                 devices = devices) %>%
+    filter(method_code == config$combination_method, A == config$A_threshold,
+           B == config$B_threshold, C == config$C_threshold)
+  NA
+}
