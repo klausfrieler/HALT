@@ -299,12 +299,12 @@ tests_scc_utility <- function(baserate_hp = 211/1194,
 #' @inheritParams tests_scc_utility
 #'
 #' @export
-a_priori_est_scc(baserate_hp = 211/1194,
-                 devices = "HP",
-                 switch_to_target = 3/4,
-                 min_number,
-                 min_prob = .8,
-                 tolerance = as.integer(0)) {
+a_priori_est_scc <- function(baserate_hp = 211/1194,
+                             devices = "HP",
+                             switch_to_target = 3/4,
+                             min_number,
+                             min_prob = .8,
+                             tolerance = as.integer(0)) {
   stopifnot(baserate_hp < 1,
             baserate_hp > 0,
             devices %in% c("HP","LS"),
@@ -320,9 +320,13 @@ a_priori_est_scc(baserate_hp = 211/1194,
 
   q <- (qnorm(p = 1 - min_prob))^2
   p <- tests$prob_scc_target
-  a <- NA
+  a <- ((-1/p) * (2*min_number - 1 + (1 - p)*q))
   b <- ((min_number - .5) / p)^2
 
-  tests$samplesize <-
+  tests$samplesize <- ceiling(
     - .5*a + sqrt((.5*a)^2 - b)
+  )
+
+  tests$min_quality_percent <- 100*min_number/tests$samplesize
+  tests
 }
