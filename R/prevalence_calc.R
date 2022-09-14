@@ -180,8 +180,9 @@ post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_thresho
 #' this event. To return screening procedures with similar required sample
 #' sizes use the parameter \code{tolerance}.
 #'
+#' @section Model:
 #' The function uses the Normal approximation of the Binomial distribution with
-#' continuity correction.
+#' continuity correction. For details, see \insertCite{HALT_2;textual}{HALT}.
 #'
 #' @inheritParams auto_config
 #'
@@ -243,7 +244,7 @@ a_priori_est <- function(baserate_hp = 211/1194,
 
   tests <- tests %>% dplyr::select(-false_ls_rate, -false_hp_rate, -logic_expr) %>%
     filter(samplesize <= min(samplesize) + tolerance) %>%
-    dplyr::arrange(samplesize)
+    dplyr::arrange(samplesize, expectation_total_participants, min_quality_percent)
   # explanation text
   explanation <-
     sprintf(
@@ -295,9 +296,13 @@ tests_scc_utility <- function(baserate_hp = 211/1194,
 
 #' A priori estimations for SCC
 #'
+#' @inheritSection a_priori_est Model
+#'
 #' @inheritParams a_priori_est
 #' @inheritParams tests_scc_utility
 #'
+#' @references
+#' \insertAllCited{}
 #' @export
 a_priori_est_scc <- function(baserate_hp = 211/1194,
                              devices = "HP",
@@ -343,5 +348,7 @@ a_priori_est_scc <- function(baserate_hp = 211/1194,
     )
   }
   tests$min_quality_percent <- 100 * min_number / tests$samplesize
-  tests %>% dplyr::select(!c(false_hp_rate, false_ls_rate))
+  tests %>% dplyr::select(!c(false_hp_rate, false_ls_rate, logic_expr)) %>%
+    filter(samplesize <= min(samplesize) + tolerance) %>%
+    dplyr::arrange(samplesize, expectation_total_participants, min_quality_percent)
 }
