@@ -410,5 +410,18 @@ post_hoc_est_scc <- function(combination_method,
                                  devices = devices) %>%
     filter(method_code == config$combination_method, A == config$A_threshold,
            B == config$B_threshold, C == config$C_threshold)
-  NA
+  if (is.null(min_prob)) {
+    k <- min_number - target_selfreported
+    k <- ifelse(k < 0, 0, k)
+    n <- target_tested
+    min_prob <- sum(dbinom(k:n, size = n,
+                           prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
+                                         procedure$scc_ls_pv[1])))
+  } else {
+    min_number <- qbinom(p = min_prob, size = n,
+                         prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
+                                       procedure$scc_ls_pv[1]),
+                         lower.tail = FALSE)
+  }
+  #
 }
