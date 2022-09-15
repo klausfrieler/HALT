@@ -40,9 +40,37 @@ the target device.}
 \item{target_tested}{Number of participants who reported the use of a
 playback device other than the target device and got a test result
 indicating the use of the target device.}
+
+\item{min_number}{minimum number of participants \code{k} who are in the
+final sample and should have used the correct device.
+When you use \code{min_number} you cannot use \code{min_prob}, i.e.
+\code{min_prob = NULL}.}
+
+\item{min_prob}{(greater than 0, less than 1) for the event that
+at least an unknown number of participants \code{k} who are in the final
+sample used the correct device.
+When you use \code{min_prob} you cannot use \code{min_number}, i.e.
+\code{min_number = NULL}.}
 }
 \description{
 This function provides probabilistic statements about the composition of a
 sample after application of a certain test procedure within SCC. For this
 purpose a Binomial distribution is used.
+}
+\details{
+Within SCC the final sample contains participants who reported the use of
+the target playback device and participants who did not do so but got a
+test result indicating the use of the target device.
+Given a test procedure, switching prevalence, the number of participants who
+reported the use of the target playback device, and the number of
+participants who reported the use of a device other than the target device
+and got a test result indicating the use of the target device the event that
+at least \code{k} participants who are in the final sample used the correct
+device is considered.
+The function either calculates the minimum probability for this event for a
+given \code{k} or \code{k} for a given probability for this event.
+}
+\note{
+Only one of the arguments \code{min_number} and \code{min_prob} can be
+used.
 }
