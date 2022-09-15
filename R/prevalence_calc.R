@@ -369,6 +369,7 @@ a_priori_est_scc <- function(baserate_hp = 211/1194,
 #' playback device other than the target device and got a test result
 #' indicating the use of the target device.
 #'
+#' @export
 post_hoc_est_scc <- function(combination_method,
                              A_threshold,
                              B_threshold,
@@ -410,10 +411,10 @@ post_hoc_est_scc <- function(combination_method,
                                  devices = devices) %>%
     filter(method_code == config$combination_method, A == config$A_threshold,
            B == config$B_threshold, C == config$C_threshold)
+  n <- target_tested
   if (is.null(min_prob)) {
     k <- min_number - target_selfreported
     k <- ifelse(k < 0, 0, k)
-    n <- target_tested
     min_prob <- sum(dbinom(k:n, size = n,
                            prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
                                          procedure$scc_ls_pv[1])))
@@ -421,7 +422,30 @@ post_hoc_est_scc <- function(combination_method,
     min_number <- qbinom(p = min_prob, size = n,
                          prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
                                        procedure$scc_ls_pv[1]),
-                         lower.tail = FALSE)
+                         lower.tail = FALSE) + target_selfreported
   }
   #
+  est <- data.frame(combination_method = combination_method,
+                    A = config$A_threshold,
+                    B = config$B_threshold,
+                    C = config$C_threshold,
+                    target_selfreported = target_selfreported,
+                    target_tested = target_tested,
+                    switch_to_target = switch_to_target,
+                    min_number = min_number,
+                    min_prob = min_prob,
+                    min_data_qual_perc = min_number /
+                      (target_selfreported + target_tested))
+
+  devices <- ifelse(devices == "HP", "headphones", "loudspeakers")
+  explanation <- c(
+    sprintf("You used test combination %i with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively.",
+            combination_method, A_threshold, B_threshold, C_threshold),
+    sprintf("When %i participant indicated the use of %s and %i did not but there test result was %s your total sample size is %i.",
+            target_selfreported, devices, target_tested, devices, target_selfreported + target_tested),
+    sprintf("For the given test combination and this sample, the probability that at least %i participants used %s is %f according to a Binomial model and the assumption of an unbiased self-report.",
+            min_number, devices, min_prob))
+
+  attr(est, "explanation") <- explanation
+  est
 }
