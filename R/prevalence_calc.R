@@ -359,11 +359,11 @@ a_priori_est_scc <- function(baserate_hp = 211/1194,
 
   explanation <-
     sprintf(
-      "When the prevelance for headphones in your target sample is assumed to be %.4f and the switching prevalence is assumed to be %.4f and the screening method '%s' (code %i) with thresholds of %i, %i, and %i for tests A, B, and C is used, a sample of %i participants who indicated the use of %s or their test result was %s is required to have a probability of at least %.2f that %i participants actually used %s. The percentage of correct identified target playback devices ('quality') of such a sample would then be at least %.1f percent.",
+      "When the prevelance for headphones in your target sample is assumed to be %.4f and the switching prevalence is assumed to be %.4f and the screening method '%s' (code %i) with thresholds of %i, %i, and %i for tests A, B, and C is used, a sample of %i participants who indicated the use of %s or their test result was %s is required to have a probability of at least %.2f that %i participants actually used %s. The percentage of correct identified target playback devices ('quality') of such a sample would then be at least %.1f percent with a probability of at least %.2f.",
       baserate_hp, switch_to_target, tests$method[1], tests$method_code[1],
       as.integer(tests$A[1]), as.integer(tests$B[1]), as.integer(tests$C[1]),
       as.integer(tests$samplesize[1]), devices, devices, min_prob,
-      as.integer(min_number), devices, tests$min_quality_percent[1])
+      as.integer(min_number), devices, tests$min_quality_percent[1], min_prob)
   attr(tests, "explanation") <- explanation
   tests
 }
