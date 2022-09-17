@@ -30,7 +30,7 @@ x$packages[x$packages$package %in% c("HALT", "psychTestR"), ]
 
 4. Install the HALT:
 
-`devtools::install_github('klausfrieler/HALT', ref = "main")`
+`devtools::install_github('KilianSander/HALT', ref = "main")`
 (The ref = "main" is needed for older github installation, as github changed the default branch name from "master" to "main" recently.)
 
 ## Usage

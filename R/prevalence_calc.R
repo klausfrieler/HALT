@@ -112,11 +112,15 @@ max_properties <- function(baserate_hp = 211/1194) {
 #' device
 #'
 #' @param min_number minimum number of participants \code{k} who passed the
-#' test procedure and used the correct device
+#' test procedure and should have used the correct device.
+#' When you use \code{min_number} you cannot use \code{min_prob}, i.e.
+#' \code{min_prob = NULL}.
 #'
 #' @param min_prob Probability (greater than 0, less than 1) for the event that
 #' at least an unknown number of participants \code{k} who passed the test
-#' procedure used the correct device
+#' procedure used the correct device.
+#' When you use \code{min_prob} you cannot use \code{min_number}, i.e.
+#' \code{min_number = NULL}.
 #'
 #' @note Only one of the arguments \code{min_number} and \code{min_prob} can be
 #' used.
@@ -348,7 +352,140 @@ a_priori_est_scc <- function(baserate_hp = 211/1194,
     )
   }
   tests$min_quality_percent <- 100 * min_number / tests$samplesize
-  tests %>% dplyr::select(!c(false_hp_rate, false_ls_rate, logic_expr)) %>%
+  tests <- tests %>%
+    dplyr::select(!c(false_hp_rate, false_ls_rate, logic_expr)) %>%
     filter(samplesize <= min(samplesize) + tolerance) %>%
     dplyr::arrange(samplesize, expectation_total_participants, min_quality_percent)
+
+  explanation <-
+    sprintf(
+      "When the prevelance for headphones in your target sample is assumed to be %.4f and the switching prevalence is assumed to be %.4f and the screening method '%s' (code %i) with thresholds of %i, %i, and %i for tests A, B, and C is used, a sample of %i participants who indicated the use of %s or their test result was %s is required to have a probability of at least %.2f that %i participants actually used %s. The percentage of correct identified target playback devices ('quality') of such a sample would then be at least %.1f percent with a probability of at least %.2f.",
+      baserate_hp, switch_to_target, tests$method[1], tests$method_code[1],
+      as.integer(tests$A[1]), as.integer(tests$B[1]), as.integer(tests$C[1]),
+      as.integer(tests$samplesize[1]), devices, devices, min_prob,
+      as.integer(min_number), devices, tests$min_quality_percent[1], min_prob)
+  attr(tests, "explanation") <- explanation
+  tests
+}
+
+#' Post hoc estimation for SCC
+#'
+#' This function provides probabilistic statements about the composition of a
+#' sample after application of a certain test procedure within SCC. For this
+#' purpose a Binomial distribution is used.
+#'
+#' Within SCC the final sample contains participants who reported the use of
+#' the target playback device and participants who did not do so but got a
+#' test result indicating the use of the target device.
+#' Given a test procedure, switching prevalence, the number of participants who
+#' reported the use of the target playback device, and the number of
+#' participants who reported the use of a device other than the target device
+#' and got a test result indicating the use of the target device the event that
+#' at least \code{k} participants who are in the final sample used the correct
+#' device is considered.
+#' The function either calculates the minimum probability for this event for a
+#' given \code{k} or \code{k} for a given probability for this event.
+#'
+#' @inheritParams make_config
+#' @inheritParams tests_scc_utility
+#' @inherit post_hoc_est note
+#'
+#' @param target_selfreported Number of participants who reported the use of
+#' the target device.
+#'
+#' @param target_tested Number of participants who reported the use of a
+#' playback device other than the target device and got a test result
+#' indicating the use of the target device.
+#'
+#' @param min_number minimum number of participants \code{k} who are in the
+#' final sample and should have used the correct device.
+#' When you use \code{min_number} you cannot use \code{min_prob}, i.e.
+#' \code{min_prob = NULL}.
+#'
+#' @param min_prob (greater than 0, less than 1) for the event that
+#' at least an unknown number of participants \code{k} who are in the final
+#' sample used the correct device.
+#' When you use \code{min_prob} you cannot use \code{min_number}, i.e.
+#' \code{min_number = NULL}.
+#'
+#' @export
+post_hoc_est_scc <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             switch_to_target,
+                             devices,
+                             target_selfreported,
+                             target_tested,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(combination_method %in% 1:18,
+            all(c(A_threshold,B_threshold,C_threshold) %in% 0:6),
+            switch_to_target < 1,
+            switch_to_target > 0,
+            devices %in% c("HP","LS"),
+            as.integer(target_selfreported) == as.double(target_selfreported),
+            as.integer(target_tested) == as.double(target_tested),
+            ((min_number <= (target_selfreported + target_tested) & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+  )
+  if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0) {
+    stop(sprintf("combination_method = %i needs A_threshold > 0!",
+                 combination_method))
+  }
+  if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){
+    stop(sprintf("combination_method = %i needs B_threshold > 0!",
+                 combination_method))
+  }
+  if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){
+    stop(sprintf("combination_method = %i needs C_threshold > 0!",
+                 combination_method))
+  }
+  config <- make_config(combination_method = combination_method,
+                        A_threshold = A_threshold,
+                        B_threshold = B_threshold,
+                        C_threshold = C_threshold,
+                        baserate_hp = switch_to_target,
+                        devices = devices)
+  procedure <- tests_scc_utility(switch_to_target = switch_to_target,
+                                 devices = devices) %>%
+    filter(method_code == config$combination_method, A == config$A_threshold,
+           B == config$B_threshold, C == config$C_threshold)
+  n <- target_tested
+  if (is.null(min_prob)) {
+    k <- min_number - target_selfreported
+    k <- ifelse(k < 0, 0, k)
+    min_prob <- sum(dbinom(k:n, size = n,
+                           prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
+                                         procedure$scc_ls_pv[1])))
+  } else {
+    min_number <- qbinom(p = min_prob, size = n,
+                         prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
+                                       procedure$scc_ls_pv[1]),
+                         lower.tail = FALSE) + target_selfreported
+  }
+  #
+  est <- data.frame(combination_method = combination_method,
+                    A = config$A_threshold,
+                    B = config$B_threshold,
+                    C = config$C_threshold,
+                    screening_strat = "SCC",
+                    target_selfreported = target_selfreported,
+                    target_tested = target_tested,
+                    switch_to_target = switch_to_target,
+                    min_number = min_number,
+                    min_prob = min_prob,
+                    min_data_qual_perc = min_number /
+                      (target_selfreported + target_tested))
+
+  devices <- ifelse(devices == "HP", "headphones", "loudspeakers")
+  explanation <- c(
+    sprintf("You used test combination %i with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively.",
+            combination_method, A_threshold, B_threshold, C_threshold),
+    sprintf("When %i participant indicated the use of %s and %i did not but their test result was %s your total sample size is %i.",
+            target_selfreported, devices, target_tested, devices, target_selfreported + target_tested),
+    sprintf("For the given test combination and this sample, the probability that at least %i participants used %s is %f according to a Binomial model and the assumption of an unbiased self-report.",
+            min_number, devices, min_prob))
+
+  attr(est, "explanation") <- explanation
+  est
 }

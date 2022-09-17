@@ -36,11 +36,15 @@ prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.}
 device}
 
 \item{min_number}{minimum number of participants \code{k} who passed the
-test procedure and used the correct device}
+test procedure and should have used the correct device.
+When you use \code{min_number} you cannot use \code{min_prob}, i.e.
+\code{min_prob = NULL}.}
 
 \item{min_prob}{Probability (greater than 0, less than 1) for the event that
 at least an unknown number of participants \code{k} who passed the test
-procedure used the correct device}
+procedure used the correct device.
+When you use \code{min_prob} you cannot use \code{min_number}, i.e.
+\code{min_number = NULL}.}
 }
 \description{
 This function provides probabilistic statements about the composition of a

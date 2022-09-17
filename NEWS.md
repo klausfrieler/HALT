@@ -1,3 +1,7 @@
+# HALT 0.12.1
+
+* post hoc estimations for SCC
+
 # HALT 0.12.0
 
 * a priori estimations for SCC
