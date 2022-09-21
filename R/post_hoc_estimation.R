@@ -84,6 +84,9 @@ post_hoc_estimation <- function(screening_strat,
       stop("baserate_hp has to be between 0 and 1!")
     }
   }
+  if(!xor(is.null(min_number), is.null(min_prob))) {
+    stop("You have to specify exactly one of the arguments min_number and min_prob!")
+  }
   config <- make_config(combination_method = combination_method,
                         A_threshold = A_threshold,
                         B_threshold = B_threshold,
@@ -158,7 +161,7 @@ post_hoc_proc <- function(screening_strat,
   procedure
 }
 
-
+#' @export
 post_hoc_calc_min_number <- function(screening_strat,
                                      config,
                                      min_prob,
@@ -185,6 +188,7 @@ post_hoc_calc_min_number <- function(screening_strat,
   min_number
 }
 
+#' @export
 post_hoc_calc_min_prob <- function(screening_strat,
                                    config,
                                    min_number,
