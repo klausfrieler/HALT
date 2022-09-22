@@ -10,6 +10,7 @@ post_hoc_tibble(
   A,
   B,
   C,
+  target_device,
   sample_size = NA,
   target_selfreported = NA,
   target_tested = NA,
