@@ -241,7 +241,7 @@ post_hoc_tibble <- function(screening_strat,
   min_data_qual_perc <-
     ifelse(screening_strat == "scc",
            min_number / (target_selfreported + target_tested),
-           min_number / sample_size)
+           min_number / sample_size) * 100
 
   if (screening_strat == "scc") {
     sample_size <- NA
