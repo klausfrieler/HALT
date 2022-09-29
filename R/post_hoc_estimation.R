@@ -244,7 +244,7 @@ post_hoc_tibble <- function(screening_strat,
            min_number / sample_size) * 100
 
   if (screening_strat == "scc") {
-    sample_size <- NA
+    sample_size <- target_selfreported + target_tested
     baserate_hp <- NA
   } else {
     target_selfreported <- NA
@@ -259,9 +259,9 @@ post_hoc_tibble <- function(screening_strat,
                 baserate_hp = baserate_hp,
                 target_device = target_device,
                 switch_to_target = switch_to_target,
-                sample_size = sample_size,
                 target_selfreported = target_selfreported,
                 target_tested = target_tested,
+                sample_size = sample_size,
                 min_number = min_number,
                 min_prob = min_prob,
                 min_data_qual_perc = min_data_qual_perc) %>%
