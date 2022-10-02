@@ -17,7 +17,8 @@ post_hoc_explanation(
   sample_size = NA,
   target_selfreported = NA,
   target_tested = NA,
-  switch_to_target = NA
+  switch_to_target = NA,
+  min_data_qual_perc
 )
 }
 \description{

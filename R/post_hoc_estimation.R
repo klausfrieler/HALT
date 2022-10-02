@@ -143,7 +143,8 @@ post_hoc_estimation <- function(screening_strat,
                          sample_size = samplesize,
                          target_selfreported = target_selfreported,
                          target_tested = target_tested,
-                         switch_to_target = switch_to_target)
+                         switch_to_target = switch_to_target,
+                         min_data_qual_perc = est$min_data_qual_perc[[1]])
   est
 }
 
@@ -289,14 +290,13 @@ post_hoc_explanation <- function(screening_strat,
                                  sample_size = NA,
                                  target_selfreported = NA,
                                  target_tested = NA,
-                                 switch_to_target = NA
-) {
-  combi <- test_config %>% filter(method_code == combination_method) %>%
-    dplyr::select(method) %>% dplyr::distinct() %>% unlist() %>% unname()
-  explanation <-
-    sprintf("You used test combination '%s' (evaluation key %i) with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively, within screening strategy %s.",
-            combi, combination_method, A, B, C, toupper(screening_strat))
+                                 switch_to_target = NA,
+                                 min_data_qual_perc) {
+  combi <- evaluation_keys()[combination_method]
   devices <- ifelse(devices == "HP", "headphones", "loudspeakers")
+  explanation <-
+    sprintf("You used test combination '%s' (evaluation key %i) with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively, within screening strategy %s and %s as target devices.",
+            combi, combination_method, A, B, C, toupper(screening_strat), devices)
   if (screening_strat != "scc") {
     explanation <- c(
       explanation,
@@ -314,5 +314,10 @@ post_hoc_explanation <- function(screening_strat,
               baserate_hp, switch_to_target, min_number, devices, min_prob)
     )
   }
+  explanation <- c(
+    explanation,
+    sprintf("The percentage of correct identified target playback devices ('quality') for this setting is at least %.1f percent with a probability of at least %.4f.",
+            min_data_qual_perc, min_prob)
+  )
   explanation
 }
