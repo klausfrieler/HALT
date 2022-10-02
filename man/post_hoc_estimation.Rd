@@ -83,8 +83,13 @@ Depending on the screening strategy either \code{samplesize} and
 \code{baserate_hp} (for \code{"fwr"} or \code{"far"}) or
 \code{target_selfreported}, \code{target_tested}, and
 \code{switch_to_target} (for \code{"scc"}) are needed.
+
+For details, see \insertCite{HALT_2;textual}{HALT}.
 }
 \note{
 Only one of the arguments \code{min_number} and \code{min_prob} can be
 used.
+}
+\references{
+\insertAllCited{}
 }

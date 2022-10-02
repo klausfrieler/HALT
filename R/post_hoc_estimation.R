@@ -13,6 +13,8 @@
 #' \code{target_selfreported}, \code{target_tested}, and
 #' \code{switch_to_target} (for \code{"scc"}) are needed.
 #'
+#' For details, see \insertCite{HALT_2;textual}{HALT}.
+#'
 #' @param screening_strat three-letter lower-case abbreviation of the screening
 #' strategy. See \code{\link{screening_strategies}}
 #'
@@ -47,6 +49,9 @@
 #'
 #' @note Only one of the arguments \code{min_number} and \code{min_prob} can be
 #' used.
+#'
+#' @references
+#' \insertAllCited{}
 #'
 #' @export
 post_hoc_estimation <- function(screening_strat,
