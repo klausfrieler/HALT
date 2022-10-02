@@ -316,7 +316,7 @@ post_hoc_explanation <- function(screening_strat,
   }
   explanation <- c(
     explanation,
-    sprintf("The percentage of correct identified target playback devices ('quality') for this setting is at least %.1f percent with a probability of at least %.4f.",
+    sprintf("The percentage of correct identified target playback devices ('quality') for this setting is at least %.1f %% with a probability of at least %.4f.",
             min_data_qual_perc, min_prob)
   )
   explanation
