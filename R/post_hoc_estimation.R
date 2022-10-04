@@ -279,6 +279,7 @@ post_hoc_tibble <- function(screening_strat,
 #' Generate explanation text for Post hoc estimation
 #'
 #' This functions provides an explanatory text for a post hoc estimation.
+#' It is used inside \code{\link{post_hoc_estimation}}.
 #'
 #' @export
 post_hoc_explanation <- function(screening_strat,

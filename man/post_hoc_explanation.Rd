@@ -23,4 +23,5 @@ post_hoc_explanation(
 }
 \description{
 This functions provides an explanatory text for a post hoc estimation.
+It is used inside \code{\link{post_hoc_estimation}}.
 }
