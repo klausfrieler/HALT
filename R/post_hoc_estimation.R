@@ -67,6 +67,7 @@ post_hoc_estimation <- function(screening_strat,
                                 switch_to_target = NA,
                                 min_number = NULL,
                                 min_prob = NULL) {
+  stopifnot(screening_strat %in% names(screening_strategies()))
   if(screening_strat == "scc") {
     if (is.na(target_selfreported) | is.na(target_tested) | is.na(switch_to_target)) {
       stop("For SCC you have to specify target_selfreported, target_tested, and switch_to_target!")
