@@ -297,7 +297,7 @@ post_hoc_explanation <- function(screening_strat,
   combi <- evaluation_keys()[combination_method]
   devices <- ifelse(devices == "HP", "headphones", "loudspeakers")
   explanation <-
-    sprintf("You used test combination '%s' (evaluation key %i) with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively, within screening strategy %s and %s as target devices.",
+    sprintf("You used the test combination '%s' (evaluation key %i) with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively, within screening strategy %s and %s as target devices.",
             combi, combination_method, A, B, C, toupper(screening_strat), devices)
   if (screening_strat != "scc") {
     explanation <- c(
@@ -310,15 +310,17 @@ post_hoc_explanation <- function(screening_strat,
   } else {
     explanation <- c(
       explanation,
-      sprintf("When %i participant indicated the use of %s and %i did not but their test result was %s your total sample size is %i.",
-              target_selfreported, devices, target_tested, devices, target_selfreported + target_tested),
+      #sprintf("When %i participant indicated the use of %s and %i did not but their test result was %s your total sample size is %i.",
+      #        target_selfreported, devices, target_tested, devices, target_selfreported + target_tested),
+      sprintf("Your total sample size is %i participants. The sample consists of %i participants who self-reported the use of %s and %i who did not, but their test result was %s.",
+              target_selfreported + target_tested, target_selfreported, devices, target_tested, devices),
       sprintf("For the given test combination, this sample, a prevalence for headphones of %.4f and a switching prevalence of %.4f, the probability that at least %i participants used %s is %.4f according to a Binomial model and the assumption of an unbiased self-report.",
               baserate_hp, switch_to_target, min_number, devices, min_prob)
     )
   }
   explanation <- c(
     explanation,
-    sprintf("The percentage of correct identified target playback devices ('quality') for this setting is at least %.1f %% with a probability of at least %.4f.",
+    sprintf("The percentage of correctly identified target playback devices ('quality') for this setting is at least %.1f %% with a probability of at least %.4f.",
             min_data_qual_perc, min_prob)
   )
   explanation
