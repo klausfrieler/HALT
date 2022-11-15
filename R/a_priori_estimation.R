@@ -146,7 +146,7 @@ a_priori_explanation <- function(screening_strat,
            " "),
     sprintf("whose tests indicate the use of %s is required to have a probability of at least %.4f that %i participants actually used %s. ",
             devices_str, min_prob, min_number, devices_str),
-    sprintf("The percentage of correct identified target playback devices ('quality') of such a sample would then be at least %.1f %% with a probability of %.4f",
+    sprintf("The percentage of correctly identified target playback devices ('quality') of such a sample would then be at least %.1f %% with a probability of %.4f",
             test_method$min_quality_percent, min_prob)
   )
   explanation
