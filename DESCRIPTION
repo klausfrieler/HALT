@@ -1,7 +1,7 @@
 Package: HALT
 Type: Package
 Title: Headphone and Loudspeaker Test
-Version: 0.12.1
+Version: 0.12.2
 Authors@R: c(
   person("Klaus", "Frieler", email = "kf@omniversum.de", role = c("aut", "cre"), comment=c(ORCID="0000-0002-6055-377X")),
   person("Yves", "Wycisk", email = "yves.wycisk@hmtm-hannover.de", role = c("aut"), comment=c(ORCID="0000-0001-9969-525X")),
@@ -31,6 +31,6 @@ Suggests:
     knitr,
     rmarkdown
 Remotes: pmcharrison/psychTestR, klausfrieler/RAT
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 VignetteBuilder: knitr
 RdMacros: Rdpack

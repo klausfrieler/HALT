@@ -454,11 +454,11 @@ post_hoc_est_scc <- function(combination_method,
   if (is.null(min_prob)) {
     k <- min_number - target_selfreported
     k <- ifelse(k < 0, 0, k)
-    min_prob <- sum(dbinom(k:n, size = n,
+    min_prob <- sum(dbinom(k:target_tested, size = target_tested,
                            prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
                                          procedure$scc_ls_pv[1])))
   } else {
-    min_number <- qbinom(p = min_prob, size = n,
+    min_number <- qbinom(p = min_prob, size = target_tested,
                          prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
                                        procedure$scc_ls_pv[1]),
                          lower.tail = FALSE) + target_selfreported
@@ -480,12 +480,146 @@ post_hoc_est_scc <- function(combination_method,
   devices <- ifelse(devices == "HP", "headphones", "loudspeakers")
   explanation <- c(
     sprintf("You used test combination %i with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively.",
-            combination_method, A_threshold, B_threshold, C_threshold),
+            combination_method, config$A_threshold, config$B_threshold, config$C_threshold),
     sprintf("When %i participant indicated the use of %s and %i did not but their test result was %s your total sample size is %i.",
             target_selfreported, devices, target_tested, devices, target_selfreported + target_tested),
-    sprintf("For the given test combination and this sample, the probability that at least %i participants used %s is %f according to a Binomial model and the assumption of an unbiased self-report.",
+    sprintf("For the given test combination and this sample, the probability that at least %i participants used %s is %.4f according to a Binomial model and the assumption of an unbiased self-report.",
             min_number, devices, min_prob))
 
   attr(est, "explanation") <- explanation
   est
 }
+
+#' Post hoc estimation for FWR and FAR
+#'
+#' @inheritParams make_config
+#' @inheritParams post_hoc_est_scc
+#'
+#' @param samplesize Number of participants who got a test result indicating
+#' the use of the target device and who are therefore in the final sample.
+#'
+#' @export
+post_hoc_est_fwr <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             baserate_hp,
+                             devices,
+                             samplesize,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(samplesize > 0,
+            as.integer(samplesize) == as.double(samplesize),
+            ((min_number <= samplesize & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+  )
+
+  config <- HALT::make_config(combination_method = combination_method,
+                              A_threshold = A_threshold,
+                              B_threshold = B_threshold,
+                              C_threshold = C_threshold,
+                              baserate_hp = baserate_hp,
+                              devices = devices,
+                              use_scc = FALSE,
+                              devices_exclude = TRUE)
+  procedure <- tests_pv_utility(baserate_hp = baserate_hp) %>%
+    filter(method_code == config$combination_method,
+           A == config$A_threshold,
+           B == config$B_threshold,
+           C == config$C_threshold)
+
+  if (is.null(min_prob)) {
+    min_prob <-
+      sum(dbinom(min_number:samplesize,
+                 size = samplesize,
+                 prob = ifelse(devices == "HP", procedure$hp_pv[1],
+                               procedure$ls_pv[1]))
+          )
+  } else {
+    min_number <-
+      qbinom(p = min_prob, size = samplesize,
+             prob = ifelse(devices == "HP", procedure$hp_pv[1],
+                           procedure$ls_pv[1]),
+             lower.tail = FALSE)
+  }
+
+  est <- post_hoc_tibble(combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         target_device = devices,
+                         screening_strat = "fwr",
+                         baserate_hp = baserate_hp,
+                         sample_size = samplesize,
+                         min_number = min_number,
+                         min_prob = min_prob)
+  attr(est, "explanation") <-
+    post_hoc_explanation(screening_strat = "fwr",
+                         combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         devices = devices,
+                         baserate_hp = baserate_hp,
+                         min_number = min_number,
+                         min_prob = min_prob,
+                         sample_size = samplesize)
+  est
+}
+
+#' @rdname post_hoc_est_fwr
+#' @export
+post_hoc_est_far <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             baserate_hp,
+                             devices,
+                             samplesize,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(samplesize > 0,
+            as.integer(samplesize) == samplesize,
+            ((min_number <= samplesize & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+            )
+  config <- make_config(combination_method = combination_method,
+                        A_threshold = A_threshold,
+                        B_threshold = B_threshold,
+                        C_threshold = C_threshold,
+                        baserate_hp = baserate_hp,
+                        devices = devices)
+
+  if (is.null(min_prob)) {
+    min_prob <- post_hoc_calc_min_prob(screening_strat = "far",
+                                       config = config,
+                                       sample_size = samplesize,
+                                       min_number = min_number)
+  } else {
+    min_number <- post_hoc_calc_min_number(screening_strat = "far",
+                                           config = config,
+                                           sample_size = samplesize,
+                                           min_prob = min_prob)
+  }
+  est <- post_hoc_tibble(combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         target_device = devices,
+                         screening_strat = "far",
+                         baserate_hp = baserate_hp,
+                         sample_size = samplesize,
+                         min_number = min_number,
+                         min_prob = min_prob)
+  attr(est, "explanation") <-
+    post_hoc_explanation(screening_strat = "far",
+                         combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         devices = devices,
+                         baserate_hp = baserate_hp,
+                         min_number = min_number,
+                         min_prob = min_prob,
+                         sample_size = samplesize)
+  est
+}
+
