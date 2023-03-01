@@ -31,6 +31,6 @@ Suggests:
     knitr,
     rmarkdown
 Remotes: pmcharrison/psychTestR, klausfrieler/RAT
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 RdMacros: Rdpack
