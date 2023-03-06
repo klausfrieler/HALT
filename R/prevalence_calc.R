@@ -3,12 +3,10 @@
 #' This function calculates the predictive values and the overall utility for a
 #' given prevalence for headphones.
 #'
-#' @param baserate_hp Sets the (estimated) prevalence of headphones in the
-#' target population as a number between 0 and 1. Defaults to the unbiased
-#' prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.
+#' @inheritParams auto_config
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 tests_pv_utility <- function(baserate_hp = 211/1194) {
@@ -32,7 +30,7 @@ tests_pv_utility <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_hp_pv <- function(baserate_hp = 211/1194) {
@@ -49,7 +47,7 @@ max_hp_pv <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_ls_pv <- function(baserate_hp = 211/1194) {
@@ -67,7 +65,7 @@ max_ls_pv <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_utility <- function(baserate_hp = 211/1194) {
@@ -86,7 +84,7 @@ max_utility <- function(baserate_hp = 211/1194) {
 #' @inheritParams tests_pv_utility
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 max_properties <- function(baserate_hp = 211/1194) {
@@ -114,17 +112,21 @@ max_properties <- function(baserate_hp = 211/1194) {
 #' device
 #'
 #' @param min_number minimum number of participants \code{k} who passed the
-#' test procedure and used the correct device
+#' test procedure and should have used the correct device.
+#' When you use \code{min_number} you cannot use \code{min_prob}, i.e.
+#' \code{min_prob = NULL}.
 #'
 #' @param min_prob Probability (greater than 0, less than 1) for the event that
 #' at least an unknown number of participants \code{k} who passed the test
-#' procedure used the correct device
+#' procedure used the correct device.
+#' When you use \code{min_prob} you cannot use \code{min_number}, i.e.
+#' \code{min_number = NULL}.
 #'
 #' @note Only one of the arguments \code{min_number} and \code{min_prob} can be
 #' used.
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_threshold, baserate_hp, devices, samplesize, min_number = NULL, min_prob = NULL) {
@@ -182,8 +184,9 @@ post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_thresho
 #' this event. To return screening procedures with similar required sample
 #' sizes use the parameter \code{tolerance}.
 #'
+#' @section Model:
 #' The function uses the Normal approximation of the Binomial distribution with
-#' continuity correction.
+#' continuity correction. For details, see \insertCite{HALT_2;textual}{HALT}.
 #'
 #' @inheritParams auto_config
 #'
@@ -199,16 +202,19 @@ post_hoc_est <- function(combination_method, A_threshold, B_threshold, C_thresho
 #' If set to a value > 0 the function returns the screening procedures whose
 #' sample sizes exceed the minimum sample size by at most this value.
 #'
-#' @return probabilistic statement (explanation text) and a transposed data
-#' frame with the characteristics of the test procedure(s).
+#' @return A tibble (data frame) with the characteristics of the test
+#' procedure(s) and the attribute \code{explanation}.
+#' This attribute is intended as an explanatory text containing a
+#' probabilistic statement for the test procedure requiring the smallest sample
+#' size.
 #'
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #' @export
 a_priori_est <- function(baserate_hp = 211/1194,
                          devices = "HP",
                          min_number,
-                         min_prob,
+                         min_prob = .8,
                          tolerance = as.integer(0)) {
   stopifnot(baserate_hp < 1,
             baserate_hp > 0,
@@ -242,7 +248,7 @@ a_priori_est <- function(baserate_hp = 211/1194,
 
   tests <- tests %>% dplyr::select(-false_ls_rate, -false_hp_rate, -logic_expr) %>%
     filter(samplesize <= min(samplesize) + tolerance) %>%
-    dplyr::arrange(samplesize)
+    dplyr::arrange(samplesize, expectation_total_participants, min_quality_percent)
   # explanation text
   explanation <-
     sprintf(
@@ -252,3 +258,368 @@ a_priori_est <- function(baserate_hp = 211/1194,
   # actual output
   tests
 }
+
+#' Calculate overall utilities and target device probabilities for SCC
+#'
+#' @inheritParams auto_config
+#'
+#' @param switch_to_target Sets the (estimated) switching prevalence.
+#' The switching prevalence describes the probability that a participant who
+#' indicates the use of a device other than the target device actually switches
+#' to the target device after being prompted to do so.
+#'
+#' @export
+tests_scc_utility <- function(baserate_hp = 211/1194,
+                              devices = "HP",
+                              switch_to_target = 3/4) {
+  stopifnot(baserate_hp < 1,
+            baserate_hp > 0,
+            switch_to_target < 1,
+            switch_to_target > 0,
+            length(devices) == 1L,
+            devices %in% c("HP", "LS"))
+  if (devices == "HP") {
+    tests <- tests_pv_utility(baserate_hp = switch_to_target)
+    tests$prob_scc_target <-
+      (baserate_hp + (1 - baserate_hp)*switch_to_target*tests$true_hp_rate) /
+      (baserate_hp + (1 - baserate_hp)*(switch_to_target*tests$true_hp_rate +
+                                          (1 - switch_to_target)*tests$false_hp_rate))
+  } else {
+    tests <- tests_pv_utility(baserate_hp = 1 - switch_to_target)
+    tests$prob_scc_target <-
+      (1 - baserate_hp + baserate_hp*switch_to_target*tests$true_ls_rate) /
+      (1 - baserate_hp + baserate_hp*(switch_to_target*tests$true_ls_rate +
+                                        (1 - switch_to_target)*tests$false_ls_rate))
+  }
+  tests <- tests %>% dplyr::rename(scc_hp_pv = hp_pv,
+                                   scc_ls_pv = ls_pv,
+                                   scc_utility = utility) %>%
+    mutate(scc_target = devices)
+  tests
+}
+
+#' A priori estimations for SCC
+#'
+#' @inheritSection a_priori_est Model
+#'
+#' @inheritParams a_priori_est
+#' @inheritParams tests_scc_utility
+#'
+#' @references
+#' \insertAllCited{}
+#' @export
+a_priori_est_scc <- function(baserate_hp = 211/1194,
+                             devices = "HP",
+                             switch_to_target = 3/4,
+                             min_number,
+                             min_prob = .8,
+                             tolerance = as.integer(0)) {
+  stopifnot(baserate_hp < 1,
+            baserate_hp > 0,
+            devices %in% c("HP","LS"),
+            min_number > 0,
+            as.integer(min_number) == as.double(min_number),
+            min_prob >= 0.6,
+            min_prob < 1,
+            tolerance >= 0,
+            as.integer(tolerance)==as.double(tolerance))
+  tests <- tests_scc_utility(baserate_hp = baserate_hp,
+                             devices = devices,
+                             switch_to_target = switch_to_target)
+
+  q <- (qnorm(p = 1 - min_prob))^2
+  p <- tests$prob_scc_target
+  a <- ((-1/p) * (2*min_number - 1 + (1 - p)*q))
+  b <- ((min_number - .5) / p)^2
+
+  tests$samplesize <- ceiling(
+    - .5*a + sqrt((.5*a)^2 - b)
+  )
+
+  if(devices == "HP") {
+    tests$expectation_total_participants <- ceiling(
+      tests$samplesize /
+        (baserate_hp + (1 - baserate_hp) *
+           (switch_to_target * tests$true_hp_rate + (1 - switch_to_target) * tests$false_hp_rate)
+         )
+    )
+  } else {
+    tests$expectation_total_participants <- ceiling(
+      tests$samplesize /
+        ((1 - baserate_hp) + baserate_hp *
+           ((1 - switch_to_target) * tests$false_ls_rate + switch_to_target * tests$true_ls_rate)
+         )
+    )
+  }
+  tests$min_quality_percent <- 100 * min_number / tests$samplesize
+  tests <- tests %>%
+    dplyr::select(!c(false_hp_rate, false_ls_rate, logic_expr)) %>%
+    filter(samplesize <= min(samplesize) + tolerance) %>%
+    dplyr::arrange(samplesize, expectation_total_participants, min_quality_percent)
+
+  explanation <-
+    sprintf(
+      "When the prevelance for headphones in your target sample is assumed to be %.4f and the switching prevalence is assumed to be %.4f and the screening method '%s' (code %i) with thresholds of %i, %i, and %i for tests A, B, and C is used, a sample of %i participants who indicated the use of %s or their test result was %s is required to have a probability of at least %.2f that %i participants actually used %s. The percentage of correct identified target playback devices ('quality') of such a sample would then be at least %.1f percent with a probability of at least %.2f.",
+      baserate_hp, switch_to_target, tests$method[1], tests$method_code[1],
+      as.integer(tests$A[1]), as.integer(tests$B[1]), as.integer(tests$C[1]),
+      as.integer(tests$samplesize[1]), devices, devices, min_prob,
+      as.integer(min_number), devices, tests$min_quality_percent[1], min_prob)
+  attr(tests, "explanation") <- explanation
+  tests
+}
+
+#' Post hoc estimation for SCC
+#'
+#' This function provides probabilistic statements about the composition of a
+#' sample after application of a certain test procedure within SCC. For this
+#' purpose a Binomial distribution is used.
+#'
+#' Within SCC the final sample contains participants who reported the use of
+#' the target playback device and participants who did not do so but got a
+#' test result indicating the use of the target device.
+#' Given a test procedure, switching prevalence, the number of participants who
+#' reported the use of the target playback device, and the number of
+#' participants who reported the use of a device other than the target device
+#' and got a test result indicating the use of the target device the event that
+#' at least \code{k} participants who are in the final sample used the correct
+#' device is considered.
+#' The function either calculates the minimum probability for this event for a
+#' given \code{k} or \code{k} for a given probability for this event.
+#'
+#' @inheritParams make_config
+#' @inheritParams tests_scc_utility
+#' @inherit post_hoc_est note
+#'
+#' @param target_selfreported Number of participants who reported the use of
+#' the target device.
+#'
+#' @param target_tested Number of participants who reported the use of a
+#' playback device other than the target device and got a test result
+#' indicating the use of the target device.
+#'
+#' @param min_number minimum number of participants \code{k} who are in the
+#' final sample and should have used the correct device.
+#' When you use \code{min_number} you cannot use \code{min_prob}, i.e.
+#' \code{min_prob = NULL}.
+#'
+#' @param min_prob (greater than 0, less than 1) for the event that
+#' at least an unknown number of participants \code{k} who are in the final
+#' sample used the correct device.
+#' When you use \code{min_prob} you cannot use \code{min_number}, i.e.
+#' \code{min_number = NULL}.
+#'
+#' @export
+post_hoc_est_scc <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             switch_to_target,
+                             devices,
+                             target_selfreported,
+                             target_tested,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(combination_method %in% 1:18,
+            all(c(A_threshold,B_threshold,C_threshold) %in% 0:6),
+            switch_to_target < 1,
+            switch_to_target > 0,
+            devices %in% c("HP","LS"),
+            as.integer(target_selfreported) == as.double(target_selfreported),
+            as.integer(target_tested) == as.double(target_tested),
+            ((min_number <= (target_selfreported + target_tested) & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+  )
+  if(combination_method %in% c(1,4,5,8:18) && A_threshold == 0) {
+    stop(sprintf("combination_method = %i needs A_threshold > 0!",
+                 combination_method))
+  }
+  if(combination_method %in% c(2,4,5,6,7, 10:18) && B_threshold == 0){
+    stop(sprintf("combination_method = %i needs B_threshold > 0!",
+                 combination_method))
+  }
+  if(combination_method %in% c(3,6,7,8:18) && C_threshold == 0){
+    stop(sprintf("combination_method = %i needs C_threshold > 0!",
+                 combination_method))
+  }
+  config <- make_config(combination_method = combination_method,
+                        A_threshold = A_threshold,
+                        B_threshold = B_threshold,
+                        C_threshold = C_threshold,
+                        baserate_hp = switch_to_target,
+                        devices = devices)
+  procedure <- tests_scc_utility(switch_to_target = switch_to_target,
+                                 devices = devices) %>%
+    filter(method_code == config$combination_method, A == config$A_threshold,
+           B == config$B_threshold, C == config$C_threshold)
+  n <- target_tested
+  if (is.null(min_prob)) {
+    k <- min_number - target_selfreported
+    k <- ifelse(k < 0, 0, k)
+    min_prob <- sum(dbinom(k:target_tested, size = target_tested,
+                           prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
+                                         procedure$scc_ls_pv[1])))
+  } else {
+    min_number <- qbinom(p = min_prob, size = target_tested,
+                         prob = ifelse(devices == "HP", procedure$scc_hp_pv[1],
+                                       procedure$scc_ls_pv[1]),
+                         lower.tail = FALSE) + target_selfreported
+  }
+  #
+  est <- data.frame(combination_method = combination_method,
+                    A = config$A_threshold,
+                    B = config$B_threshold,
+                    C = config$C_threshold,
+                    screening_strat = "SCC",
+                    target_selfreported = target_selfreported,
+                    target_tested = target_tested,
+                    switch_to_target = switch_to_target,
+                    min_number = min_number,
+                    min_prob = min_prob,
+                    min_data_qual_perc = min_number /
+                      (target_selfreported + target_tested))
+
+  devices <- ifelse(devices == "HP", "headphones", "loudspeakers")
+  explanation <- c(
+    sprintf("You used test combination %i with thresholds %i, %i, and %i for Test A, Test B, and Test C, respectively.",
+            combination_method, config$A_threshold, config$B_threshold, config$C_threshold),
+    sprintf("When %i participant indicated the use of %s and %i did not but their test result was %s your total sample size is %i.",
+            target_selfreported, devices, target_tested, devices, target_selfreported + target_tested),
+    sprintf("For the given test combination and this sample, the probability that at least %i participants used %s is %.4f according to a Binomial model and the assumption of an unbiased self-report.",
+            min_number, devices, min_prob))
+
+  attr(est, "explanation") <- explanation
+  est
+}
+
+#' Post hoc estimation for FWR and FAR
+#'
+#' @inheritParams make_config
+#' @inheritParams post_hoc_est_scc
+#'
+#' @param samplesize Number of participants who got a test result indicating
+#' the use of the target device and who are therefore in the final sample.
+#'
+#' @export
+post_hoc_est_fwr <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             baserate_hp,
+                             devices,
+                             samplesize,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(samplesize > 0,
+            as.integer(samplesize) == as.double(samplesize),
+            ((min_number <= samplesize & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+  )
+
+  config <- HALT::make_config(combination_method = combination_method,
+                              A_threshold = A_threshold,
+                              B_threshold = B_threshold,
+                              C_threshold = C_threshold,
+                              baserate_hp = baserate_hp,
+                              devices = devices,
+                              use_scc = FALSE,
+                              devices_exclude = TRUE)
+  procedure <- tests_pv_utility(baserate_hp = baserate_hp) %>%
+    filter(method_code == config$combination_method,
+           A == config$A_threshold,
+           B == config$B_threshold,
+           C == config$C_threshold)
+
+  if (is.null(min_prob)) {
+    min_prob <-
+      sum(dbinom(min_number:samplesize,
+                 size = samplesize,
+                 prob = ifelse(devices == "HP", procedure$hp_pv[1],
+                               procedure$ls_pv[1]))
+          )
+  } else {
+    min_number <-
+      qbinom(p = min_prob, size = samplesize,
+             prob = ifelse(devices == "HP", procedure$hp_pv[1],
+                           procedure$ls_pv[1]),
+             lower.tail = FALSE)
+  }
+
+  est <- post_hoc_tibble(combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         target_device = devices,
+                         screening_strat = "fwr",
+                         baserate_hp = baserate_hp,
+                         sample_size = samplesize,
+                         min_number = min_number,
+                         min_prob = min_prob)
+  attr(est, "explanation") <-
+    post_hoc_explanation(screening_strat = "fwr",
+                         combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         devices = devices,
+                         baserate_hp = baserate_hp,
+                         min_number = min_number,
+                         min_prob = min_prob,
+                         sample_size = samplesize)
+  est
+}
+
+#' @rdname post_hoc_est_fwr
+#' @export
+post_hoc_est_far <- function(combination_method,
+                             A_threshold,
+                             B_threshold,
+                             C_threshold,
+                             baserate_hp,
+                             devices,
+                             samplesize,
+                             min_number = NULL,
+                             min_prob = NULL) {
+  stopifnot(samplesize > 0,
+            as.integer(samplesize) == samplesize,
+            ((min_number <= samplesize & min_number >= 0) & is.null(min_prob)) || (is.null(min_number) & (min_prob <= 1 & min_prob >= 0))
+            )
+  config <- make_config(combination_method = combination_method,
+                        A_threshold = A_threshold,
+                        B_threshold = B_threshold,
+                        C_threshold = C_threshold,
+                        baserate_hp = baserate_hp,
+                        devices = devices)
+
+  if (is.null(min_prob)) {
+    min_prob <- post_hoc_calc_min_prob(screening_strat = "far",
+                                       config = config,
+                                       sample_size = samplesize,
+                                       min_number = min_number)
+  } else {
+    min_number <- post_hoc_calc_min_number(screening_strat = "far",
+                                           config = config,
+                                           sample_size = samplesize,
+                                           min_prob = min_prob)
+  }
+  est <- post_hoc_tibble(combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         target_device = devices,
+                         screening_strat = "far",
+                         baserate_hp = baserate_hp,
+                         sample_size = samplesize,
+                         min_number = min_number,
+                         min_prob = min_prob)
+  attr(est, "explanation") <-
+    post_hoc_explanation(screening_strat = "far",
+                         combination_method = combination_method,
+                         A = config$A_threshold,
+                         B = config$B_threshold,
+                         C = config$C_threshold,
+                         devices = devices,
+                         baserate_hp = baserate_hp,
+                         min_number = min_number,
+                         min_prob = min_prob,
+                         sample_size = samplesize)
+  est
+}
+

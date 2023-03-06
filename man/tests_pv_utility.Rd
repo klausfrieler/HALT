@@ -9,12 +9,12 @@ tests_pv_utility(baserate_hp = 211/1194)
 \arguments{
 \item{baserate_hp}{Sets the (estimated) prevalence of headphones in the
 target population as a number between 0 and 1. Defaults to the unbiased
-prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.}
+prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.}
 }
 \description{
 This function calculates the predictive values and the overall utility for a
 given prevalence for headphones.
 }
 \references{
-\insertRef{HALTpaper}{HALT}
+\insertAllCited{}
 }

@@ -26,11 +26,15 @@ See also the documentation there for further explanations.}
 \item{dict}{The psychTestR dictionary used for internationalisation.}
 }
 \description{
-This function defines a HALT  module for incorporation into a
-psychTestR timeline.
+This function defines a Headphone and Loudspeaker Test
+\insertCite{@HALT; @HALT_1 and @HALT_2}{HALT} module for incorporation into
+a psychTestR timeline.
 Use this function if you want to include the HALT in a
 battery of other tests, or if you want to add custom psychTestR
 pages to your test timeline.
 For a standalone implementation of the HALT,
 consider using \code{\link{HALT_standalone}()}.
+}
+\references{
+\insertAllCited{}
 }

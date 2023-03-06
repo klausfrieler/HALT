@@ -5,7 +5,7 @@
 #'
 #' @param baserate_hp Sets the (estimated) prevalence of headphones in the
 #' target population as a number between 0 and 1. Defaults to the unbiased
-#' prevalence B of 0.1767 from \insertCite{HALTpaper;textual}{HALT}.
+#' prevalence B of 0.1767 from \insertCite{HALT_2;textual}{HALT}.
 #'
 #' @param devices Sets the desired playback device. Possible settings are
 #' \code{"HP"} for headphones or \code{"LS"} for loudspeakers.
@@ -31,7 +31,7 @@
 #' @param lr_audio_exclude (boolean, default = T) Flag, if wrong answer on left-right audio question shall lead to exclusion.
 #' @param devices_exclude (boolean, default = T) Flag, if a classification other than \code{device} shall lead to exclusion.
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #' @export
 #'
 auto_config <- function(volume_level = "-8.4 LUFS",
@@ -195,7 +195,7 @@ show_config <- function(config = HALT::auto_config()) {
 #' @param C_threshold (scalar integer) Threshold for Test C (1 to 6).
 #' @inheritParams auto_config
 #' @references
-#' \insertRef{HALTpaper}{HALT}
+#' \insertAllCited{}
 #'
 #' @export
 make_config <- function(volume_level = "-8.4 LUFS",
