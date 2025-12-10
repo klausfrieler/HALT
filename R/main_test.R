@@ -97,8 +97,8 @@ main_test <- function(label,
   p04_max_count <- ifelse(config$lr_img_exclude, 0, 1)
   max_count <- config$loop_exclude
   elts <- psychTestR::join(
-    page_po1(audio_dir, num_pages, type = type),
-    page_force_correct(2L, num_pages, config, audio_dir, type = type, show_id = show_id),
+    page_po1(audio_dir, num_pages, type = type, dict = dict),
+    page_force_correct(2L, num_pages, config, audio_dir, type = type, show_id = show_id, dict = dict),
     psychTestR::conditional(
       test = function(state, ...){
         if(config$lr_audio_exclude  == FALSE){
@@ -114,13 +114,13 @@ main_test <- function(label,
   if (config$channel_check) {
     elts <- psychTestR::join(
       elts,
-      page_po4(config, audio_dir, num_pages),
-      page_po5(config, audio_dir, num_pages, type = type, show_id = show_id)
+      page_po4(config, audio_dir, num_pages, dict = dict),
+      page_po5(config, audio_dir, num_pages, type = type, show_id = show_id, dict = dict)
     )
   }
   elts <- psychTestR::join(
     elts,
-    device_page(num_pages, config)
+    device_page(num_pages, config, dict = dict)
   )
   if (config$use_scc) {
     elts <- psychTestR::join(
@@ -136,9 +136,9 @@ main_test <- function(label,
   if (config$screening_parts) {
     elts <- psychTestR::join(
       elts,
-      page_ABC_section(6L, num_pages, audio_dir, type = type, config = config, show_id = show_id),
-      page_ABC_section(7L, num_pages, audio_dir, type = type, config = config, show_id = show_id),
-      page_ABC_section(13L, num_pages, audio_dir, type = type, config = config, show_id = show_id),
+      page_ABC_section(6L, num_pages, audio_dir, type = type, config = config, show_id = show_id, dict = dict),
+      page_ABC_section(7L, num_pages, audio_dir, type = type, config = config, show_id = show_id, dict = dict),
+      page_ABC_section(13L, num_pages, audio_dir, type = type, config = config, show_id = show_id, dict = dict),
       psychTestR::code_block(
         get_device(config)
       ),
@@ -159,10 +159,10 @@ main_test <- function(label,
     if (config$frequency_check) {
       elts <- psychTestR::join(
         elts,
-        page_calibrate(8L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
-        page_calibrate(9L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
-        page_calibrate(10L, num_pages, audio_dir, config = config, type = type, show_id = show_id),
-        page_calibrate(11L, num_pages, audio_dir, config = config, type = type, show_id = show_id)
+        page_calibrate(8L, num_pages, audio_dir, config = config, type = type, show_id = show_id, dict = dict),
+        page_calibrate(9L, num_pages, audio_dir, config = config, type = type, show_id = show_id, dict = dict),
+        page_calibrate(10L, num_pages, audio_dir, config = config, type = type, show_id = show_id, dict = dict),
+        page_calibrate(11L, num_pages, audio_dir, config = config, type = type, show_id = show_id, dict = dict)
       )
     }
   #}

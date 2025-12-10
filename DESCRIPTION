@@ -1,11 +1,11 @@
 Package: HALT
 Type: Package
 Title: Headphone and Loudspeaker Test
-Version: 0.12.2
+Version: 0.12.3
 Authors@R: c(
-  person("Klaus", "Frieler", email = "kf@omniversum.de", role = c("aut", "cre"), comment=c(ORCID="0000-0002-6055-377X")),
-  person("Yves", "Wycisk", email = "yves.wycisk@hmtm-hannover.de", role = c("aut"), comment=c(ORCID="0000-0001-9969-525X")),
-  person("Kilian", "Sander", email = "kilian.sander@aol.com", role = c("aut"), comment=c(ORCID="0000-0003-3770-7483"))
+  person("Klaus", "Frieler", role = c("aut"), comment=c(ORCID="0000-0002-6055-377X")),
+  person("Yves", "Wycisk", role = c("aut"), comment=c(ORCID="0000-0001-9969-525X")),
+  person("Kilian", "Vogt", email = "kilian.vogt@hmtm-hannover.de", role = c("aut", "cre"), comment=c(ORCID="0000-0003-3770-7483"))
   )
 Maintainer: Klaus Frieler <kf@omniversum.de>
 Description: Implementation of a headphone and loudspeaker test for online experiments.

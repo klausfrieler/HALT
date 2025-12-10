@@ -1,3 +1,13 @@
+# HALT 0.12.3
+
+* `dict` is now passed to all pages. This means that you can now use custom internationalization dictionaries.
+* reduced margins in the prompt `div` to 15%.
+
+# HALT 0.12.2
+
+* added `CITATION`
+* updated email addresses, names, and roles in `DESCRIPTION`
+
 # HALT 0.12.1
 
 * post hoc estimations for SCC

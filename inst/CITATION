@@ -1,0 +1,54 @@
+bibentry(
+  header = "To cite HALT in publications, please use the first article",
+  bibtype  = "Article",
+  title    = "The {H}eadphone and {L}oudspeaker {T}est -- {P}art {I}: {S}uggestions for controlling characteristics of playback devices in internet experiments",
+  author   = c(
+    person("Yves", "Wycisk"),
+    person("Reinhard", "Kopiez"),
+    person("Jakob", "Bergner"),
+    person("Kilian", "Sander"),
+    person("Stephan", "Preihs"),
+    person("Jürgen", "Peissig"),
+    person("Friedrich", "Platz")
+  ),
+  journal  = "Behavior Research Methods",
+  year     = "2023",
+  volume   = 55,
+  number   = 3,
+  pages    = "1094--1107",
+  doi      = "10.3758/s13428-022-01859-8",
+  key = "HALT1"
+)
+bibentry(
+  header = "the second article",
+  bibtype  = "Article",
+  title    = "The {H}eadphone and {L}oudspeaker {T}est -- {P}art {II}: {A} comprehensive playback device screening method in Internet experiments",
+  author   = c(
+    person("Yves", "Wycisk"),
+    person("Kilian", "Sander"),
+    person("Benedetto", "Manca"),
+    person("Reinhard", "Kopiez"),
+    person("Friedrich", "Platz")
+  ),
+  journal  = "Behavior Research Methods",
+  year     = "2024",
+  volume   = 56,
+  number   = 1,
+  pages    = "362--378",
+  doi      = "10.3758/s13428-022-02048-3",
+  key = "HALT2"
+)
+bibentry(
+  header = "and the package itself",
+  bibtype = "manual",
+  title = "{HALT}",
+  author = c(
+    person("Klaus", "Frieler", role = c("aut", "cre")),
+    person("Yves", "Wycisk", role = c("aut")),
+    person("Kilian", "Vogt", role = c("aut"))
+  ),
+  note = "R package version 0.12.2",
+  year = "2025",
+  url = "https://github.com/KilianSander/HALT",
+  key = "HALTpackage"
+)
